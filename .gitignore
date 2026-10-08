@@ -1,0 +1,24 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+# generated data & warehouse (reproducible via run_all.sh)
+data/raw/
+data/raw_*/
+data/exports/
+warehouse/*.duckdb
+warehouse/*.duckdb.wal
+spark/output/
+spark-warehouse/
+metastore_db/
+derby.log
+# dbt artifacts
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+logs/
+# local secrets
+.env
+dbt/.user.yml
+data/dq_answer_key*.csv
