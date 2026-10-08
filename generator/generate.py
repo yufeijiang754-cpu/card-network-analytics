@@ -68,16 +68,18 @@ def build_issuers(rng: np.random.Generator, n: int) -> pd.DataFrame:
     per_country["US"] = n - sum(per_country.values())
     countries = np.concatenate([[c] * k for c, k in per_country.items()])
     rng.shuffle(countries)
-    first, last = ref.ISSUER_NAME_PARTS
+    issuer_type = rng.choice(["Bank", "Credit Union", "Fintech"], size=n, p=[0.65, 0.2, 0.15])
+    first, _ = ref.ISSUER_NAME_PARTS
+    suffix_by_type = {"Bank": ["Bank", "Bancorp", "Savings Bank", "Trust"],
+                      "Credit Union": ["Credit Union"], "Fintech": ["Financial", "Pay", "Card Co."]}
     names, used = [], set()
-    for _ in range(n):
+    for t in issuer_type:
         while True:
-            nm = f"{rng.choice(first)} {rng.choice(last)}"
+            nm = f"{rng.choice(first)} {rng.choice(suffix_by_type[t])}"
             if nm not in used:
                 used.add(nm)
                 names.append(nm)
                 break
-    issuer_type = rng.choice(["Bank", "Credit Union", "Fintech"], size=n, p=[0.65, 0.2, 0.15])
     is_large = rng.random(n) < 0.45
     df = pd.DataFrame({
         "issuer_id": _ids("ISS", np.arange(1, n + 1), 3),
@@ -86,7 +88,6 @@ def build_issuers(rng: np.random.Generator, n: int) -> pd.DataFrame:
         "issuer_type": issuer_type,
         "asset_size_tier": np.where(is_large, "Large (>$10B)", "Small (<$10B)"),
     })
-    df["is_regulated_debit"] = df["asset_size_tier"].str.startswith("Large")
     # Hidden behavioural parameters (not exported)
     df["_share"] = rng.lognormal(0, 0.9, n) * np.where(is_large, 3.0, 1.0)
     df["_decline_bias"] = rng.normal(0, 0.012, n)
@@ -94,6 +95,10 @@ def build_issuers(rng: np.random.Generator, n: int) -> pd.DataFrame:
     df.loc[df.issuer_id == AGGRESSIVE_CNP_ISSUER, "_cnp_decline_bias"] = 0.11
     df.loc[df.issuer_id == AGGRESSIVE_CNP_ISSUER, "country_code"] = "US"
     df.loc[df.issuer_id == OUTAGE_ISSUER, "country_code"] = "US"
+    # The outage issuer is a top-3 US issuer so a 3-hour outage is material (~30 auths/hour).
+    df.loc[df.issuer_id == OUTAGE_ISSUER, "_share"] = df._share.max() * 0.8
+    df.loc[df.issuer_id == OUTAGE_ISSUER, "asset_size_tier"] = "Large (>$10B)"
+    df["is_regulated_debit"] = df["asset_size_tier"].str.startswith("Large")
     df["onboarded_date"] = pd.to_datetime("2005-01-01") + pd.to_timedelta(rng.integers(0, 6000, n), unit="D")
     return df
 
@@ -160,7 +165,9 @@ def build_merchants(rng: np.random.Generator, n: int, acquirers: pd.DataFrame) -
     })
     df["_popularity"] = rng.lognormal(0, 1.1, n)
     # High-chargeback merchants (planted for anomaly detection): CNP-heavy categories, US.
-    risky = df.index[df.mcc.isin(["5964", "5816", "5815", "4511", "5732"]) & (df.country_code == "US")]
+    risky_mask = df.mcc.isin(["5964", "5816", "5815", "4511", "5732"]) & (df.country_code == "US")
+    # pick from the busier merchants so the pattern is statistically visible
+    risky = df.index[risky_mask & (df._popularity >= df.loc[risky_mask, "_popularity"].quantile(0.75))]
     df["_high_cb"] = False
     df.loc[rng.choice(risky, N_HIGH_CHARGEBACK_MERCHANTS, replace=False), "_high_cb"] = True
     # Card-testing targets: digital-goods merchants onboarded by the PayFac acquirer.

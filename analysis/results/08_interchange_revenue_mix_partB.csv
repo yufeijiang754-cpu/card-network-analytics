@@ -1,0 +1,23 @@
+mcc_category,channel,approved_usd,interchange_usd,effective_rate,share_of_interchange
+Retail,card_present,22823686.0,335650.0,0.0147,0.1625
+Travel,card_not_present,16561040.0,319453.0,0.0193,0.1546
+Dining,card_present,12574583.0,231949.0,0.0184,0.1123
+Grocery,card_present,16907008.0,225770.0,0.0134,0.1093
+E-commerce,card_not_present,11617896.0,213183.0,0.0183,0.1032
+Retail,card_not_present,10617140.0,164929.0,0.0155,0.0798
+Travel,card_present,8496175.0,155732.0,0.0183,0.0754
+Fuel,card_present,10423899.0,135602.0,0.013,0.0656
+Digital Goods,card_not_present,1810241.0,40544.0,0.0224,0.0196
+Health,card_present,2429106.0,40334.0,0.0166,0.0195
+Utilities,card_not_present,3410052.0,38974.0,0.0114,0.0189
+Transportation,card_not_present,1400667.0,29290.0,0.0209,0.0142
+Subscriptions,card_not_present,1105065.0,25626.0,0.0232,0.0124
+Grocery,card_not_present,1389439.0,19927.0,0.0143,0.0096
+Dining,card_not_present,891531.0,17890.0,0.0201,0.0087
+Unclassified,card_present,1115809.0,17062.0,0.0153,0.0083
+Transportation,card_present,774696.0,15495.0,0.02,0.0075
+Gambling,card_not_present,745531.0,14788.0,0.0198,0.0072
+Unclassified,card_not_present,695101.0,10879.0,0.0157,0.0053
+Gambling,card_present,344849.0,6547.0,0.019,0.0032
+Health,card_not_present,260360.0,4569.0,0.0175,0.0022
+Utilities,card_present,182424.0,1917.0,0.0105,0.0009

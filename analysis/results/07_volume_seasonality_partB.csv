@@ -1,0 +1,8 @@
+iso_day_of_week,day_name,avg_daily_attempts,dow_index
+1,Monday,4820.0,0.905
+2,Tuesday,4880.0,0.917
+3,Wednesday,4938.0,0.927
+4,Thursday,5110.0,0.96
+5,Friday,5715.0,1.073
+6,Saturday,6262.0,1.176
+7,Sunday,5547.0,1.042

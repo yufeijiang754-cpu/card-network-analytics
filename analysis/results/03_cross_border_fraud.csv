@@ -1,0 +1,5 @@
+geography,channel,attempts,approval_rate,fraud_attempt_rate_bps,fraud_loss_rate_bps,fraud_catch_rate,fraud_loss_usd,relative_risk_vs_domestic_cp
+cross_border,card_not_present,80831,0.8535,124.0,120.2,0.56,103899.0,34.8
+domestic,card_not_present,575604,0.9044,65.1,32.7,0.656,136770.0,18.3
+cross_border,card_present,72670,0.8983,8.1,8.5,0.492,5059.0,2.3
+domestic,card_present,1238869,0.952,3.6,4.5,0.467,31236.0,1.0

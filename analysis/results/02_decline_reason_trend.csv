@@ -1,0 +1,109 @@
+month_start,decline_reason,decline_type,declines,share_of_declines,share_change_bps_mom,volume_change_mom,rank_in_month
+2025-01-01,Insufficient Funds,soft,3452,0.3707,,,1
+2025-01-01,Do Not Honor,soft,1934,0.2077,,,2
+2025-01-01,Transaction Not Permitted,hard,787,0.0845,,,3
+2025-01-01,Expired Card,hard,762,0.0818,,,4
+2025-01-01,Exceeds Limit,soft,704,0.0756,,,5
+2025-01-01,Suspected Fraud,hard,515,0.0553,,,6
+2025-01-01,Incorrect PIN,soft,467,0.0502,,,7
+2025-01-01,Invalid Card Number,hard,430,0.0462,,,8
+2025-01-01,Issuer Unavailable,soft,260,0.0279,,,9
+2025-02-01,Insufficient Funds,soft,3412,0.3817,110.0,-0.0116,1
+2025-02-01,Do Not Honor,soft,1914,0.2141,64.0,-0.0103,2
+2025-02-01,Transaction Not Permitted,hard,732,0.0819,-26.0,-0.0699,3
+2025-02-01,Expired Card,hard,685,0.0766,-52.0,-0.101,4
+2025-02-01,Exceeds Limit,soft,619,0.0692,-64.0,-0.1207,5
+2025-02-01,Suspected Fraud,hard,500,0.0559,6.0,-0.0291,6
+2025-02-01,Invalid Card Number,hard,432,0.0483,21.0,0.0047,7
+2025-02-01,Incorrect PIN,soft,395,0.0442,-60.0,-0.1542,8
+2025-02-01,Issuer Unavailable,soft,250,0.028,0.0,-0.0385,9
+2025-03-01,Insufficient Funds,soft,3932,0.3766,-51.0,0.1524,1
+2025-03-01,Do Not Honor,soft,2306,0.2209,68.0,0.2048,2
+2025-03-01,Expired Card,hard,831,0.0796,30.0,0.2131,3
+2025-03-01,Exceeds Limit,soft,768,0.0736,43.0,0.2407,4
+2025-03-01,Transaction Not Permitted,hard,758,0.0726,-93.0,0.0355,5
+2025-03-01,Suspected Fraud,hard,597,0.0572,12.0,0.194,6
+2025-03-01,Invalid Card Number,hard,493,0.0472,-11.0,0.1412,7
+2025-03-01,Incorrect PIN,soft,457,0.0438,-4.0,0.157,8
+2025-03-01,Issuer Unavailable,soft,298,0.0285,6.0,0.192,9
+2025-04-01,Insufficient Funds,soft,3921,0.3826,59.0,-0.0028,1
+2025-04-01,Do Not Honor,soft,2278,0.2223,14.0,-0.0121,2
+2025-04-01,Expired Card,hard,823,0.0803,7.0,-0.0096,3
+2025-04-01,Transaction Not Permitted,hard,744,0.0726,-0.0,-0.0185,4
+2025-04-01,Exceeds Limit,soft,726,0.0708,-27.0,-0.0547,5
+2025-04-01,Suspected Fraud,hard,578,0.0564,-8.0,-0.0318,6
+2025-04-01,Invalid Card Number,hard,471,0.046,-13.0,-0.0446,7
+2025-04-01,Incorrect PIN,soft,432,0.0422,-16.0,-0.0547,8
+2025-04-01,Issuer Unavailable,soft,276,0.0269,-16.0,-0.0738,9
+2025-05-01,Insufficient Funds,soft,4320,0.3825,-1.0,0.1018,1
+2025-05-01,Do Not Honor,soft,2387,0.2114,-109.0,0.0478,2
+2025-05-01,Expired Card,hard,899,0.0796,-7.0,0.0923,3
+2025-05-01,Transaction Not Permitted,hard,893,0.0791,65.0,0.2003,4
+2025-05-01,Exceeds Limit,soft,842,0.0746,37.0,0.1598,5
+2025-05-01,Suspected Fraud,hard,649,0.0575,11.0,0.1228,6
+2025-05-01,Invalid Card Number,hard,527,0.0467,7.0,0.1189,7
+2025-05-01,Incorrect PIN,soft,466,0.0413,-9.0,0.0787,8
+2025-05-01,Issuer Unavailable,soft,311,0.0275,6.0,0.1268,9
+2025-06-01,Insufficient Funds,soft,3990,0.368,-145.0,-0.0764,1
+2025-06-01,Do Not Honor,soft,2330,0.2149,35.0,-0.0239,2
+2025-06-01,Expired Card,hard,900,0.083,34.0,0.0011,3
+2025-06-01,Transaction Not Permitted,hard,876,0.0808,17.0,-0.019,4
+2025-06-01,Exceeds Limit,soft,760,0.0701,-45.0,-0.0974,5
+2025-06-01,Suspected Fraud,hard,576,0.0531,-43.0,-0.1125,6
+2025-06-01,Incorrect PIN,soft,506,0.0467,54.0,0.0858,7
+2025-06-01,Invalid Card Number,hard,504,0.0465,-2.0,-0.0436,8
+2025-06-01,Issuer Unavailable,soft,401,0.037,94.0,0.2894,9
+2025-07-01,Insufficient Funds,soft,4454,0.3828,148.0,0.1163,1
+2025-07-01,Do Not Honor,soft,2435,0.2093,-56.0,0.0451,2
+2025-07-01,Transaction Not Permitted,hard,932,0.0801,-7.0,0.0639,3
+2025-07-01,Expired Card,hard,917,0.0788,-42.0,0.0189,4
+2025-07-01,Exceeds Limit,soft,856,0.0736,35.0,0.1263,5
+2025-07-01,Suspected Fraud,hard,626,0.0538,7.0,0.0868,6
+2025-07-01,Incorrect PIN,soft,559,0.048,14.0,0.1047,7
+2025-07-01,Invalid Card Number,hard,539,0.0463,-2.0,0.0694,8
+2025-07-01,Issuer Unavailable,soft,317,0.0272,-97.0,-0.2095,9
+2025-08-01,Insufficient Funds,soft,4337,0.3766,-62.0,-0.0263,1
+2025-08-01,Do Not Honor,soft,2429,0.2109,17.0,-0.0025,2
+2025-08-01,Expired Card,hard,937,0.0814,26.0,0.0218,3
+2025-08-01,Transaction Not Permitted,hard,918,0.0797,-4.0,-0.015,4
+2025-08-01,Exceeds Limit,soft,837,0.0727,-9.0,-0.0222,5
+2025-08-01,Suspected Fraud,hard,659,0.0572,34.0,0.0527,6
+2025-08-01,Incorrect PIN,soft,556,0.0483,2.0,-0.0054,7
+2025-08-01,Invalid Card Number,hard,531,0.0461,-2.0,-0.0148,8
+2025-08-01,Issuer Unavailable,soft,311,0.027,-2.0,-0.0189,9
+2025-09-01,Insufficient Funds,soft,3969,0.3211,-555.0,-0.0849,1
+2025-09-01,Do Not Honor,soft,2608,0.211,0.0,0.0737,2
+2025-09-01,Expired Card,hard,1317,0.1065,252.0,0.4055,3
+2025-09-01,Invalid Card Number,hard,1243,0.1006,544.0,1.3409,4
+2025-09-01,Suspected Fraud,hard,878,0.071,138.0,0.3323,5
+2025-09-01,Transaction Not Permitted,hard,802,0.0649,-148.0,-0.1264,6
+2025-09-01,Exceeds Limit,soft,773,0.0625,-102.0,-0.0765,7
+2025-09-01,Incorrect PIN,soft,478,0.0387,-96.0,-0.1403,8
+2025-09-01,Issuer Unavailable,soft,293,0.0237,-33.0,-0.0579,9
+2025-10-01,Insufficient Funds,soft,4141,0.3736,525.0,0.0433,1
+2025-10-01,Do Not Honor,soft,2380,0.2147,38.0,-0.0874,2
+2025-10-01,Expired Card,hard,927,0.0836,-229.0,-0.2961,3
+2025-10-01,Transaction Not Permitted,hard,876,0.079,142.0,0.0923,4
+2025-10-01,Exceeds Limit,soft,808,0.0729,104.0,0.0453,5
+2025-10-01,Suspected Fraud,hard,650,0.0586,-124.0,-0.2597,6
+2025-10-01,Invalid Card Number,hard,543,0.049,-516.0,-0.5632,7
+2025-10-01,Incorrect PIN,soft,455,0.0411,24.0,-0.0481,8
+2025-10-01,Issuer Unavailable,soft,303,0.0273,36.0,0.0341,9
+2025-11-01,Insufficient Funds,soft,4622,0.3823,87.0,0.1162,1
+2025-11-01,Do Not Honor,soft,2599,0.215,2.0,0.092,2
+2025-11-01,Expired Card,hard,989,0.0818,-18.0,0.0669,3
+2025-11-01,Exceeds Limit,soft,896,0.0741,12.0,0.1089,4
+2025-11-01,Transaction Not Permitted,hard,882,0.073,-61.0,0.0068,5
+2025-11-01,Suspected Fraud,hard,677,0.056,-26.0,0.0415,6
+2025-11-01,Invalid Card Number,hard,556,0.046,-30.0,0.0239,7
+2025-11-01,Incorrect PIN,soft,528,0.0437,26.0,0.1604,8
+2025-11-01,Issuer Unavailable,soft,340,0.0281,8.0,0.1221,9
+2025-12-01,Insufficient Funds,soft,5315,0.3812,-11.0,0.1499,1
+2025-12-01,Do Not Honor,soft,2985,0.2141,-9.0,0.1485,2
+2025-12-01,Expired Card,hard,1190,0.0854,35.0,0.2032,3
+2025-12-01,Transaction Not Permitted,hard,1051,0.0754,24.0,0.1916,4
+2025-12-01,Exceeds Limit,soft,986,0.0707,-34.0,0.1004,5
+2025-12-01,Suspected Fraud,hard,746,0.0535,-25.0,0.1019,6
+2025-12-01,Invalid Card Number,hard,651,0.0467,7.0,0.1709,7
+2025-12-01,Incorrect PIN,soft,608,0.0436,-1.0,0.1515,8
+2025-12-01,Issuer Unavailable,soft,409,0.0293,12.0,0.2029,9

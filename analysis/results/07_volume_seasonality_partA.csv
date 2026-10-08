@@ -1,0 +1,18 @@
+date_day,day_name,is_weekend,is_us_holiday,holiday_name,attempts,ma7_centered,lift_vs_trailing_28d,index_vs_same_weekday_avg
+2025-01-01,Wednesday,False,True,New Year's Day,4779,4799.0,,0.944
+2025-01-20,Monday,False,True,Martin Luther King Jr. Day,4624,4580.0,0.012,0.932
+2025-02-14,Friday,False,True,Valentine's Day,5852,4939.0,0.277,0.995
+2025-02-17,Monday,False,True,Presidents' Day,5288,4959.0,0.139,1.066
+2025-03-01,Saturday,True,False,,5934,4853.0,0.257,0.948
+2025-05-26,Monday,False,True,Memorial Day,6340,5539.0,0.195,1.277
+2025-07-04,Friday,False,True,Independence Day,7757,5749.0,0.428,1.319
+2025-09-01,Monday,False,True,Labor Day,5953,5533.0,0.088,1.199
+2025-09-20,Saturday,True,False,,6866,5511.0,0.266,1.096
+2025-11-01,Saturday,True,False,,6796,5632.0,0.27,1.085
+2025-11-11,Tuesday,False,True,Veterans Day,6171,5836.0,0.12,1.258
+2025-11-27,Thursday,False,True,Thanksgiving Day,6047,6667.0,0.048,1.179
+2025-11-28,Friday,False,True,Black Friday,12101,7272.0,1.086,2.058
+2025-12-01,Monday,False,True,Cyber Monday,9337,7500.0,0.551,1.881
+2025-12-24,Wednesday,False,True,Christmas Eve,8690,6739.0,0.293,1.717
+2025-12-25,Thursday,False,True,Christmas Day,5189,6743.0,-0.241,1.012
+2025-12-31,Wednesday,False,True,New Year's Eve,7897,6666.0,0.203,1.56

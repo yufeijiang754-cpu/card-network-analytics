@@ -1,0 +1,4 @@
+acquirer_id,acquirer_name,acquirer_type,transaction_date,cnp_attempts,small_ticket_attempts,invalid_or_expired_declines,baseline_28d_median,multiple_of_baseline,small_ticket_share,baseline_small_ticket_share,fraud_attempts
+ACQ009,Nimbus PayFac,Payment Facilitator,2025-09-18,915,793.0,387.0,2.0,193.5,0.867,0.035,789.0
+ACQ009,Nimbus PayFac,Payment Facilitator,2025-09-19,907,772.0,409.0,2.0,204.5,0.851,0.066,773.0
+ACQ009,Nimbus PayFac,Payment Facilitator,2025-09-20,927,805.0,423.0,2.0,211.5,0.868,0.096,795.0

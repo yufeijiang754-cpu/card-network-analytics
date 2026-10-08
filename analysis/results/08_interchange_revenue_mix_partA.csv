@@ -1,0 +1,7 @@
+card_segment,approved_txns,approved_usd,interchange_usd,share_of_volume,share_of_interchange,effective_rate,interchange_per_txn,cumulative_share
+Credit - Rewards,371438.0,25646309.0,573897.0,0.2026,0.2778,0.0224,1.545,0.2778
+Credit - Classic,419869.0,29003649.0,562191.0,0.2291,0.2721,0.0194,1.339,0.5499
+Credit - Premium,254254.0,17516623.0,435167.0,0.1384,0.2106,0.0248,1.712,0.7605
+Debit - Exempt,274345.0,20191403.0,202683.0,0.1595,0.0981,0.01,0.739,0.8586
+Credit - Business,106038.0,7305631.0,188883.0,0.0577,0.0914,0.0259,1.781,0.95
+Debit - Regulated (Reg II cap),408330.0,26912682.0,103289.0,0.2126,0.05,0.0038,0.253,1.0

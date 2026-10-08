@@ -1,0 +1,46 @@
+issuer_id,issuer_name,issuer_country,issuer_type,attempts,approval_rate,cnp_approval_rate,do_not_honor_rate,issuer_unavailable_declines,fraud_loss_bps,approval_rank,cnp_approval_percentile,cnp_approval_zscore,fraud_loss_quartile
+ISS007,Keystone Trust,US,Bank,29676,0.8876,0.7891,0.0549,59.0,17.1,44,0.0,-4.56,2
+ISS040,Meridian Trust,MX,Bank,11037,0.882,0.8377,0.0246,41.0,88.1,45,0.023,-2.45,4
+ISS025,Pioneer Credit Union,JP,Credit Union,20081,0.9077,0.867,0.0199,56.0,40.4,40,0.045,-1.18,4
+ISS039,Cascade Bank,US,Bank,57342,0.9076,0.8692,0.0194,151.0,13.5,41,0.068,-1.08,1
+ISS036,Pioneer Bancorp,CA,Bank,38663,0.9006,0.8697,0.0222,94.0,12.8,43,0.091,-1.06,1
+ISS018,Bluewater Credit Union,US,Credit Union,66049,0.9031,0.8707,0.019,177.0,24.0,42,0.114,-1.01,3
+ISS044,Beacon Savings Bank,US,Bank,16481,0.9098,0.8797,0.0206,36.0,13.5,37,0.136,-0.62,1
+ISS009,Beacon Credit Union,GB,Credit Union,31048,0.9097,0.8847,0.0191,89.0,16.0,38,0.159,-0.41,1
+ISS045,Harbor Savings Bank,FR,Bank,18465,0.9285,0.8849,0.0134,34.0,18.8,27,0.182,-0.4,2
+ISS019,Meridian Bancorp,US,Bank,13015,0.9082,0.8853,0.0173,45.0,29.8,39,0.205,-0.38,4
+ISS002,Keystone Savings Bank,US,Bank,22319,0.9203,0.888,0.0151,44.0,53.7,35,0.227,-0.26,4
+ISS024,Ironwood Credit Union,US,Credit Union,17798,0.9247,0.8905,0.0137,41.0,20.1,32,0.25,-0.16,3
+ISS043,Bluewater Bancorp,CA,Bank,19196,0.9194,0.8908,0.0177,39.0,18.8,36,0.273,-0.14,2
+ISS031,Frontier Bancorp,DE,Bank,28711,0.9272,0.8909,0.0168,53.0,23.0,29,0.295,-0.14,3
+ISS017,Lakeside Bancorp,US,Bank,56170,0.9266,0.8911,0.0144,129.0,22.8,31,0.318,-0.13,3
+ISS006,Keystone Bancorp,US,Bank,52008,0.9315,0.8915,0.0156,95.0,23.3,21,0.341,-0.11,3
+ISS016,Lakeside Trust,GB,Bank,18168,0.923,0.892,0.017,34.0,31.7,34,0.364,-0.09,4
+ISS029,Frontier Trust,US,Bank,12854,0.9305,0.8925,0.0132,20.0,8.7,25,0.386,-0.07,1
+ISS021,Bluewater Savings Bank,US,Bank,26456,0.931,0.8932,0.0142,62.0,4.1,23,0.432,-0.04,1
+ISS014,Meridian Credit Union,ES,Credit Union,10771,0.9244,0.8932,0.0165,23.0,20.8,33,0.409,-0.04,3
+ISS020,Granite Bancorp,US,Bank,48157,0.9353,0.8946,0.0135,89.0,26.2,17,0.455,0.02,4
+ISS008,Beacon Bank,US,Bank,26133,0.9271,0.8955,0.0157,61.0,18.8,30,0.5,0.06,2
+ISS010,Summit Bank,US,Bank,5368,0.9316,0.8953,0.0143,13.0,30.6,20,0.477,0.06,4
+ISS033,Keystone Credit Union,AU,Credit Union,9428,0.9278,0.8964,0.0158,17.0,8.0,28,0.545,0.1,1
+ISS012,Frontier Credit Union,US,Credit Union,200467,0.9312,0.8963,0.0139,494.0,20.2,22,0.523,0.1,3
+ISS013,Evergreen Savings Bank,US,Bank,73928,0.9286,0.8979,0.0152,124.0,20.2,26,0.568,0.17,3
+ISS032,Evergreen Trust,US,Bank,8412,0.9407,0.901,0.0125,13.0,5.9,11,0.614,0.3,1
+ISS004,Cascade Trust,US,Bank,25207,0.9307,0.9009,0.0139,42.0,10.4,24,0.591,0.3,1
+ISS026,Beacon Trust,MX,Bank,28995,0.9327,0.9025,0.015,66.0,21.4,19,0.636,0.37,3
+ISS001,Riverbend Financial,US,Fintech,113020,0.9345,0.903,0.0134,215.0,19.6,18,0.659,0.39,2
+ISS042,Meridian Card Co.,US,Fintech,51844,0.9364,0.9044,0.0127,85.0,19.6,16,0.682,0.45,2
+ISS027,Prairie Trust,US,Bank,249294,0.9396,0.9068,0.0123,433.0,22.4,12,0.705,0.55,3
+ISS005,Ironwood Savings Bank,US,Bank,46501,0.9376,0.9079,0.0129,64.0,22.0,14,0.727,0.6,3
+ISS041,Summit Trust,US,Bank,8185,0.9477,0.9086,0.012,6.0,7.1,4,0.75,0.63,1
+ISS023,Prairie Credit Union,US,Credit Union,21152,0.9375,0.9097,0.0125,36.0,12.6,15,0.773,0.68,1
+ISS011,Harbor Credit Union,US,Credit Union,5815,0.9383,0.9105,0.0126,8.0,17.5,13,0.795,0.71,2
+ISS028,Meridian Savings Bank,US,Bank,44357,0.9528,0.9131,0.0097,69.0,20.0,1,0.818,0.83,2
+ISS038,Silverline Savings Bank,US,Bank,63903,0.9449,0.915,0.0108,101.0,32.2,8,0.841,0.91,4
+ISS030,Redwood Credit Union,US,Credit Union,69410,0.9446,0.9153,0.0109,113.0,30.9,9,0.864,0.92,4
+ISS035,Harbor Bank,US,Bank,52806,0.9476,0.9155,0.0107,73.0,27.2,5,0.886,0.93,4
+ISS003,Pioneer Savings Bank,US,Bank,125231,0.9469,0.9163,0.011,178.0,16.2,6,0.909,0.97,2
+ISS037,Evergreen Bank,US,Bank,24545,0.9461,0.9164,0.0117,33.0,20.0,7,0.932,0.97,2
+ISS022,Northstar Credit Union,US,Credit Union,69758,0.9479,0.9181,0.0112,85.0,30.6,3,0.955,1.05,4
+ISS015,Evergreen Credit Union,US,Credit Union,16103,0.9443,0.919,0.012,21.0,17.9,10,0.977,1.08,2
+ISS034,Evergreen Bancorp,US,Bank,13647,0.9508,0.9202,0.0108,8.0,9.8,2,1.0,1.14,1

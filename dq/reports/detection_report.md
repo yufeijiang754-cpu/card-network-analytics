@@ -1,12 +1,12 @@
 # Data Quality Detection Report
 
-_Generated 2026-10-07 22:12:55 by `dq/compare_answer_key.py` from the latest dbt test artifacts. Synthetic data._
+_Generated 2026-10-07 23:55:50 by `dq/compare_answer_key.py` from the latest dbt test artifacts. Synthetic data._
 
 ## Summary
 
 - Injected defects (answer key): **41,900**
-- Detected by the test designed for that defect: **41,472**  ->  overall recall **98.98%**
-- Missed: **428** (all explained below)
+- Detected by the test designed for that defect: **41,526**  ->  overall recall **99.11%**
+- Missed: **374** (all explained below)
 - Raw-layer tests flagging 0 records outside the answer key: **19/19** (precision 100.00% overall)
 
 ## Expectations
@@ -32,7 +32,7 @@ _Generated 2026-10-07 22:12:55 by `dq/compare_answer_key.py` from the latest dbt
 | validity              | merchants    | invalid_mcc              | mcc                |        300 |        300 | 100.00%  |
 | validity              | transactions | currency_format          | currency           |       6000 |       6000 | 100.00%  |
 | uniqueness            | transactions | duplicate_transaction_id | transaction_id     |       5600 |       5600 | 100.00%  |
-| timeliness            | transactions | future_timestamp         | timestamp          |       4000 |       3572 | 89.30%   |
+| timeliness            | transactions | future_timestamp         | timestamp          |       4000 |       3626 | 90.65%   |
 | validity              | transactions | negative_amount          | amount             |       4000 |       4000 | 100.00%  |
 | completeness          | transactions | null_value               | amount             |       3000 |       3000 | 100.00%  |
 | completeness          | transactions | null_value               | auth_response_code |       1200 |       1200 | 100.00%  |
@@ -57,7 +57,7 @@ _Generated 2026-10-07 22:12:55 by `dq/compare_answer_key.py` from the latest dbt
 | dq_in_reference_list     | transactions | currency           | currency_format          |              6000 |             6000 |                               0 |                   0 | 100.00%     |
 | dq_matches_pattern       | merchants    | mcc                | invalid_mcc              |               201 |              201 |                               0 |                   0 | 100.00%     |
 | dq_matches_pattern       | transactions | currency           | currency_format          |              6000 |             6000 |                               0 |                   0 | 100.00%     |
-| dq_not_in_future         | transactions | timestamp          | future_timestamp         |              3572 |             3572 |                               0 |                   0 | 100.00%     |
+| dq_not_in_future         | transactions | timestamp          | future_timestamp         |              3626 |             3626 |                               0 |                   0 | 100.00%     |
 | dq_not_null              | transactions | amount             | null_value               |              3000 |             3000 |                               0 |                   0 | 100.00%     |
 | dq_not_null              | transactions | auth_response_code | null_value               |              1200 |             1200 |                               0 |                   0 | 100.00%     |
 | dq_not_null              | transactions | card_id            | null_value               |              2000 |             2000 |                               0 |                   0 | 100.00%     |
@@ -77,7 +77,7 @@ _Generated 2026-10-07 22:12:55 by `dq/compare_answer_key.py` from the latest dbt
 
 | issue_type       | reason                                                                                                                                                                                |   missed |
 |:-----------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------:|
-| future_timestamp | Event time is only <1-4 min> ahead of ingestion time: inside the 5-minute grace window that tolerates terminal clock drift. Missed by design (trade-off: false positives vs. recall). |      428 |
+| future_timestamp | Event time is only <1-4 min> ahead of ingestion time: inside the 5-minute grace window that tolerates terminal clock drift. Missed by design (trade-off: false positives vs. recall). |      374 |
 
 ## Coverage notes (format check vs. domain check)
 
@@ -97,8 +97,8 @@ Recall of the future-timestamp check under different clock-skew tolerances. A sm
 |   grace_minutes |   injected |   detected | recall   |
 |----------------:|-----------:|-----------:|:---------|
 |               0 |       4000 |       4000 | 100.00%  |
-|               1 |       4000 |       4000 | 100.00%  |
-|               2 |       4000 |       3850 | 96.25%   |
-|               5 |       4000 |       3572 | 89.30%   |
-|              10 |       4000 |       3572 | 89.30%   |
-|              60 |       4000 |       3572 | 89.30%   |
+|               1 |       4000 |       3999 | 99.98%   |
+|               2 |       4000 |       3864 | 96.60%   |
+|               5 |       4000 |       3626 | 90.65%   |
+|              10 |       4000 |       3626 | 90.65%   |
+|              60 |       4000 |       3626 | 90.65%   |

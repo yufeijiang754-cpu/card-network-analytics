@@ -50,3 +50,13 @@ reasoning behind each. All data in this repository is **synthetic**.
 | D-31 | Timeliness uses ingestion time as the reference: future events (5-minute grace), late arrival (24 h), and recency against a fixed `dq_as_of_ts` var. | The dataset is historical, so wall-clock comparisons would be meaningless. Leaving `dq_as_of_ts` unset in production uses `current_timestamp`. |
 | D-32 | Detection is scored at **(record, issue type, column)** level, with recall per issue and precision per test, and every miss is explained automatically. | A detection rate is only useful if it is precise about *what* was detected and *why* something was missed. |
 | D-33 | The MCC check uses both a format test and a reference-list test. | Shows that format validity (`[0-9]{4}`) is not domain validity: 99 of 300 invalid MCCs are well-formed. |
+
+## Stage 4 - Business analysis
+
+| ID | Decision | Rationale |
+|----|----------|-----------|
+| D-34 | Analysis SQL lives in `analysis/` as plain SQL against `marts.*`, run by `scripts/run_analysis.py`, which writes CSVs to `analysis/results/`. A file may contain several statements (parts A/B/C). | Analysts can read and run each query directly in any SQL client. Avoided `filter (where ...)` and other DuckDB-only syntax where an ANSI form exists, so the queries port to Snowflake with minimal change. |
+| D-35 | The card-testing detector uses a **trailing 28-day median** baseline, not mean/stddev. | Tested both. Mean/stddev flagged only day 1 because the attack contaminated its own baseline; the median flags all three days. |
+| D-36 | Chargeback alerting requires **rate >= 1% AND >= 5 disputes**, with HIGH when also 3+ sd above MCC peers. | A rate-only rule produced 235 mostly-noise alerts on small merchants. The dual threshold mirrors how network monitoring programs combine ratio and count. |
+| D-37 | Generator tweaks made while validating the analysis: the outage issuer is a top-volume issuer, issuer name suffixes match issuer type, and high-chargeback merchants are planted on top-quartile-volume merchants. | The first version planted signals on merchants and issuers too small to be statistically visible (e.g. about 4 auths/hour for the outage issuer). Re-generation needs `dbt build --full-refresh` because `fct_transactions` is incremental on `loaded_at` (see D-22). `run_all.sh` always full-refreshes. |
+| D-38 | `docs/INSIGHTS.md` openly states which patterns were planted. | Honesty about synthetic data. The portfolio value is the detection and quantification method, not the "discovery". |

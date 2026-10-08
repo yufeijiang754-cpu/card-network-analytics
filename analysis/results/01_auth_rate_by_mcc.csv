@@ -1,0 +1,19 @@
+mcc,mcc_description,mcc_category,attempts,approval_rate,cp_approval_rate,cnp_approval_rate,cnp_share,gap_vs_network_bps,excess_declines,rank_lowest_approval
+5815,"Digital Goods - Media, Books, Music",Digital Goods,75619,0.8806,,0.8806,1.0,-514.0,3890.0,1
+5816,Digital Goods - Games,Digital Goods,52813,0.8896,,0.8896,1.0,-424.0,2239.0,2
+4511,"Airlines, Air Carriers",Travel,29723,0.8954,0.9394,0.8893,0.877,-366.0,1087.0,3
+5964,Direct Marketing - Catalog Merchant,E-commerce,152280,0.8999,,0.8999,1.0,-321.0,4888.0,4
+7995,"Betting, Casino Gaming Chips",Gambling,12353,0.9058,0.9353,0.8927,0.693,-262.0,324.0,5
+4899,"Cable, Satellite and Streaming Services",Subscriptions,70258,0.9065,,0.9065,1.0,-255.0,1792.0,6
+7011,"Hotels, Motels, Resorts",Travel,42027,0.914,0.9334,0.8901,0.448,-180.0,755.0,7
+4900,"Utilities - Electric, Gas, Water",Utilities,27227,0.915,0.9545,0.913,0.952,-170.0,462.0,8
+4121,Taxicabs and Limousines,Transportation,90685,0.9161,0.9443,0.901,0.652,-159.0,1443.0,9
+5732,Electronics Stores,Retail,55863,0.9264,0.9465,0.8963,0.4,-56.0,310.0,10
+5999,Miscellaneous and Specialty Retail,Retail,120120,0.9342,0.9481,0.9018,0.3,22.0,0.0,11
+5311,Department Stores,Retail,113370,0.9363,0.9471,0.9037,0.249,43.0,0.0,12
+5411,"Grocery Stores, Supermarkets",Grocery,326341,0.9456,0.9492,0.9035,0.079,136.0,0.0,13
+5814,Fast Food Restaurants,Dining,232393,0.9461,0.9503,0.908,0.1,141.0,0.0,14
+5812,"Eating Places, Restaurants",Dining,232113,0.9464,0.949,0.9055,0.06,144.0,0.0,15
+5912,Drug Stores and Pharmacies,Health,86185,0.9466,0.9509,0.9082,0.1,146.0,0.0,16
+5541,Service Stations,Fuel,109492,0.951,0.951,,0.0,190.0,0.0,17
+5542,Automated Fuel Dispensers,Fuel,108326,0.9511,0.9511,,0.0,191.0,0.0,18
