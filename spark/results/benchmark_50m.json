@@ -1,0 +1,261 @@
+{
+  "label": "50m",
+  "fact_rows": 49200127,
+  "spark_input_files": 12,
+  "spark_version": "3.5.3",
+  "duckdb_version": "1.1.3",
+  "machine": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "cpu_count": 8,
+    "python": "3.11.5"
+  },
+  "spark_conf": {
+    "master": "local[*]",
+    "shuffle_partitions": 16,
+    "adaptive_enabled": true,
+    "driver_memory": "4g"
+  },
+  "jobs": {
+    "issuer_ranking": {
+      "analysis_sql": "analysis/04_issuer_performance_ranking.sql (statement 1)",
+      "duckdb_seconds": [
+        0.999,
+        0.912
+      ],
+      "spark_seconds": [
+        5.994,
+        4.321
+      ],
+      "reconciliation": {
+        "rows_duckdb": 45,
+        "rows_spark": 45,
+        "columns": {
+          "issuer_name": {
+            "ok": true
+          },
+          "issuer_country": {
+            "ok": true
+          },
+          "issuer_type": {
+            "ok": true
+          },
+          "attempts": {
+            "max_abs_diff": 0.0,
+            "tolerance": 1.0001,
+            "exact_matches": 45,
+            "ok": true
+          },
+          "approval_rate": {
+            "max_abs_diff": 0.0,
+            "tolerance": 0.00010001,
+            "exact_matches": 45,
+            "ok": true
+          },
+          "cnp_approval_rate": {
+            "max_abs_diff": 0.0,
+            "tolerance": 0.00010001,
+            "exact_matches": 45,
+            "ok": true
+          },
+          "do_not_honor_rate": {
+            "max_abs_diff": 0.0,
+            "tolerance": 0.00010001,
+            "exact_matches": 45,
+            "ok": true
+          },
+          "issuer_unavailable_declines": {
+            "max_abs_diff": 0.0,
+            "tolerance": 1.0001,
+            "exact_matches": 45,
+            "ok": true
+          },
+          "fraud_loss_bps": {
+            "max_abs_diff": 0.0,
+            "tolerance": 0.10001,
+            "exact_matches": 45,
+            "ok": true
+          },
+          "approval_rank": {
+            "max_abs_diff": 0.0,
+            "tolerance": 1.0001,
+            "exact_matches": 45,
+            "ok": true
+          },
+          "cnp_approval_percentile": {
+            "max_abs_diff": 0.0,
+            "tolerance": 0.0010001,
+            "exact_matches": 45,
+            "ok": true
+          },
+          "cnp_approval_zscore": {
+            "max_abs_diff": 0.0,
+            "tolerance": 0.010001,
+            "exact_matches": 45,
+            "ok": true
+          },
+          "fraud_loss_quartile": {
+            "max_abs_diff": 0.0,
+            "tolerance": 1.0001,
+            "exact_matches": 45,
+            "ok": true
+          }
+        },
+        "matched": true
+      }
+    },
+    "chargeback_anomaly": {
+      "analysis_sql": "analysis/05_chargeback_anomaly_detection.sql (statement 1)",
+      "duckdb_seconds": [
+        1.718,
+        1.592
+      ],
+      "spark_seconds": [
+        4.926,
+        3.748
+      ],
+      "reconciliation": {
+        "rows_duckdb": 348,
+        "rows_spark": 348,
+        "columns": {
+          "merchant_name": {
+            "ok": true
+          },
+          "mcc": {
+            "ok": true
+          },
+          "mcc_category": {
+            "ok": true
+          },
+          "acquirer_name": {
+            "ok": true
+          },
+          "approved": {
+            "max_abs_diff": 0.0,
+            "tolerance": 1.0001,
+            "exact_matches": 348,
+            "ok": true
+          },
+          "chargebacks": {
+            "max_abs_diff": 0.0,
+            "tolerance": 1.0001,
+            "exact_matches": 348,
+            "ok": true
+          },
+          "non_fraud_chargebacks": {
+            "max_abs_diff": 0.0,
+            "tolerance": 1.0001,
+            "exact_matches": 348,
+            "ok": true
+          },
+          "chargeback_usd": {
+            "max_abs_diff": 0.0,
+            "tolerance": 0.010001,
+            "exact_matches": 348,
+            "ok": true
+          },
+          "chargeback_rate": {
+            "max_abs_diff": 0.0,
+            "tolerance": 0.00010001,
+            "exact_matches": 348,
+            "ok": true
+          },
+          "peer_avg_chargeback_rate": {
+            "max_abs_diff": 0.0,
+            "tolerance": 0.00010001,
+            "exact_matches": 348,
+            "ok": true
+          },
+          "peer_zscore": {
+            "max_abs_diff": 0.0,
+            "tolerance": 0.10001,
+            "exact_matches": 348,
+            "ok": true
+          },
+          "alert_level": {
+            "ok": true
+          },
+          "risk_rank": {
+            "max_abs_diff": 0.0,
+            "tolerance": 1.0001,
+            "exact_matches": 348,
+            "ok": true
+          }
+        },
+        "matched": true
+      }
+    },
+    "card_testing": {
+      "analysis_sql": "analysis/06_cnp_risk_analysis.sql (statement 1)",
+      "duckdb_seconds": [
+        0.537,
+        0.414
+      ],
+      "spark_seconds": [
+        2.766,
+        1.531
+      ],
+      "reconciliation": {
+        "rows_duckdb": 3,
+        "rows_spark": 3,
+        "columns": {
+          "acquirer_name": {
+            "ok": true
+          },
+          "acquirer_type": {
+            "ok": true
+          },
+          "cnp_attempts": {
+            "max_abs_diff": 0.0,
+            "tolerance": 1.0001,
+            "exact_matches": 3,
+            "ok": true
+          },
+          "small_ticket_attempts": {
+            "max_abs_diff": 0.0,
+            "tolerance": 1.0001,
+            "exact_matches": 3,
+            "ok": true
+          },
+          "invalid_or_expired_declines": {
+            "max_abs_diff": 0.0,
+            "tolerance": 1.0001,
+            "exact_matches": 3,
+            "ok": true
+          },
+          "baseline_28d_median": {
+            "max_abs_diff": 0.0,
+            "tolerance": 0.10001,
+            "exact_matches": 3,
+            "ok": true
+          },
+          "multiple_of_baseline": {
+            "max_abs_diff": 0.0,
+            "tolerance": 0.10001,
+            "exact_matches": 3,
+            "ok": true
+          },
+          "small_ticket_share": {
+            "max_abs_diff": 0.0,
+            "tolerance": 0.0010001,
+            "exact_matches": 3,
+            "ok": true
+          },
+          "baseline_small_ticket_share": {
+            "max_abs_diff": 0.0,
+            "tolerance": 0.0010001,
+            "exact_matches": 3,
+            "ok": true
+          },
+          "fraud_attempts": {
+            "max_abs_diff": 0.0,
+            "tolerance": 1.0001,
+            "exact_matches": 3,
+            "ok": true
+          }
+        },
+        "matched": true
+      }
+    }
+  },
+  "all_matched": true
+}

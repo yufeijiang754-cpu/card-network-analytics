@@ -1,0 +1,112 @@
+== Physical Plan ==
+AdaptiveSparkPlan (19)
++- Project (18)
+   +- Filter (17)
+      +- Window (16)
+         +- Project (15)
+            +- Window (14)
+               +- Sort (13)
+                  +- Exchange (12)
+                     +- Project (11)
+                        +- BroadcastHashJoin Inner BuildRight (10)
+                           :- HashAggregate (6)
+                           :  +- Exchange (5)
+                           :     +- HashAggregate (4)
+                           :        +- Project (3)
+                           :           +- Filter (2)
+                           :              +- Scan parquet  (1)
+                           +- BroadcastExchange (9)
+                              +- Filter (8)
+                                 +- Scan parquet  (7)
+
+
+(1) Scan parquet 
+Output [7]: [transaction_date#2, acquirer_id#8, channel#11, amount_usd#17, auth_response_code#20, is_fraud#25, txn_month#32]
+Batched: true
+Location: InMemoryFileIndex [file:/Users/mac/Projects/my-project/data/exports_50m/fct_transactions_by_month]
+PushedFilters: [IsNotNull(channel), EqualTo(channel,card_not_present), IsNotNull(acquirer_id)]
+ReadSchema: struct<transaction_date:date,acquirer_id:string,channel:string,amount_usd:decimal(18,2),auth_response_code:string,is_fraud:boolean>
+
+(2) Filter
+Input [7]: [transaction_date#2, acquirer_id#8, channel#11, amount_usd#17, auth_response_code#20, is_fraud#25, txn_month#32]
+Condition : ((isnotnull(channel#11) AND (channel#11 = card_not_present)) AND isnotnull(acquirer_id#8))
+
+(3) Project
+Output [5]: [acquirer_id#8, transaction_date#2, amount_usd#17, auth_response_code#20, is_fraud#25]
+Input [7]: [transaction_date#2, acquirer_id#8, channel#11, amount_usd#17, auth_response_code#20, is_fraud#25, txn_month#32]
+
+(4) HashAggregate
+Input [5]: [acquirer_id#8, transaction_date#2, amount_usd#17, auth_response_code#20, is_fraud#25]
+Keys [2]: [acquirer_id#8, transaction_date#2]
+Functions [4]: [partial_count(1), partial_sum(CASE WHEN (amount_usd#17 < 5.00) THEN 1 ELSE 0 END), partial_sum(CASE WHEN auth_response_code#20 IN (14,54) THEN 1 ELSE 0 END), partial_sum(CASE WHEN is_fraud#25 THEN 1 ELSE 0 END)]
+Aggregate Attributes [4]: [count#1304L, sum#1305L, sum#1306L, sum#1307L]
+Results [6]: [acquirer_id#8, transaction_date#2, count#1308L, sum#1309L, sum#1310L, sum#1311L]
+
+(5) Exchange
+Input [6]: [acquirer_id#8, transaction_date#2, count#1308L, sum#1309L, sum#1310L, sum#1311L]
+Arguments: hashpartitioning(acquirer_id#8, transaction_date#2, 16), ENSURE_REQUIREMENTS, [plan_id=2160]
+
+(6) HashAggregate
+Input [6]: [acquirer_id#8, transaction_date#2, count#1308L, sum#1309L, sum#1310L, sum#1311L]
+Keys [2]: [acquirer_id#8, transaction_date#2]
+Functions [4]: [count(1), sum(CASE WHEN (amount_usd#17 < 5.00) THEN 1 ELSE 0 END), sum(CASE WHEN auth_response_code#20 IN (14,54) THEN 1 ELSE 0 END), sum(CASE WHEN is_fraud#25 THEN 1 ELSE 0 END)]
+Aggregate Attributes [4]: [count(1)#1239L, sum(CASE WHEN (amount_usd#17 < 5.00) THEN 1 ELSE 0 END)#1241L, sum(CASE WHEN auth_response_code#20 IN (14,54) THEN 1 ELSE 0 END)#1243L, sum(CASE WHEN is_fraud#25 THEN 1 ELSE 0 END)#1245L]
+Results [6]: [acquirer_id#8, transaction_date#2, count(1)#1239L AS cnp_attempts#1240L, sum(CASE WHEN (amount_usd#17 < 5.00) THEN 1 ELSE 0 END)#1241L AS small_ticket_attempts#1242L, sum(CASE WHEN auth_response_code#20 IN (14,54) THEN 1 ELSE 0 END)#1243L AS invalid_or_expired_declines#1244L, sum(CASE WHEN is_fraud#25 THEN 1 ELSE 0 END)#1245L AS fraud_attempts#1246L]
+
+(7) Scan parquet 
+Output [3]: [acquirer_id#1024, acquirer_name#1025, acquirer_type#1027]
+Batched: true
+Location: InMemoryFileIndex [file:/Users/mac/Projects/my-project/data/exports_50m/dim_acquirer.parquet]
+PushedFilters: [IsNotNull(acquirer_id)]
+ReadSchema: struct<acquirer_id:string,acquirer_name:string,acquirer_type:string>
+
+(8) Filter
+Input [3]: [acquirer_id#1024, acquirer_name#1025, acquirer_type#1027]
+Condition : isnotnull(acquirer_id#1024)
+
+(9) BroadcastExchange
+Input [3]: [acquirer_id#1024, acquirer_name#1025, acquirer_type#1027]
+Arguments: HashedRelationBroadcastMode(List(input[0, string, false]),false), [plan_id=2163]
+
+(10) BroadcastHashJoin
+Left keys [1]: [acquirer_id#8]
+Right keys [1]: [acquirer_id#1024]
+Join type: Inner
+Join condition: None
+
+(11) Project
+Output [8]: [acquirer_id#8, transaction_date#2, cnp_attempts#1240L, small_ticket_attempts#1242L, invalid_or_expired_declines#1244L, fraud_attempts#1246L, acquirer_name#1025, acquirer_type#1027]
+Input [9]: [acquirer_id#8, transaction_date#2, cnp_attempts#1240L, small_ticket_attempts#1242L, invalid_or_expired_declines#1244L, fraud_attempts#1246L, acquirer_id#1024, acquirer_name#1025, acquirer_type#1027]
+
+(12) Exchange
+Input [8]: [acquirer_id#8, transaction_date#2, cnp_attempts#1240L, small_ticket_attempts#1242L, invalid_or_expired_declines#1244L, fraud_attempts#1246L, acquirer_name#1025, acquirer_type#1027]
+Arguments: hashpartitioning(acquirer_id#8, 16), ENSURE_REQUIREMENTS, [plan_id=2167]
+
+(13) Sort
+Input [8]: [acquirer_id#8, transaction_date#2, cnp_attempts#1240L, small_ticket_attempts#1242L, invalid_or_expired_declines#1244L, fraud_attempts#1246L, acquirer_name#1025, acquirer_type#1027]
+Arguments: [acquirer_id#8 ASC NULLS FIRST, transaction_date#2 ASC NULLS FIRST], false, 0
+
+(14) Window
+Input [8]: [acquirer_id#8, transaction_date#2, cnp_attempts#1240L, small_ticket_attempts#1242L, invalid_or_expired_declines#1244L, fraud_attempts#1246L, acquirer_name#1025, acquirer_type#1027]
+Arguments: [percentile(invalid_or_expired_declines#1244L, 0.5, 1, 0, 0, false) windowspecdefinition(acquirer_id#8, transaction_date#2 ASC NULLS FIRST, specifiedwindowframe(RowFrame, -28, -1)) AS baseline_median#1264], [acquirer_id#8], [transaction_date#2 ASC NULLS FIRST]
+
+(15) Project
+Output [10]: [acquirer_id#8, transaction_date#2, cnp_attempts#1240L, small_ticket_attempts#1242L, invalid_or_expired_declines#1244L, fraud_attempts#1246L, acquirer_name#1025, acquirer_type#1027, baseline_median#1264, (cast(small_ticket_attempts#1242L as double) / cast(cnp_attempts#1240L as double)) AS _w0#1277]
+Input [9]: [acquirer_id#8, transaction_date#2, cnp_attempts#1240L, small_ticket_attempts#1242L, invalid_or_expired_declines#1244L, fraud_attempts#1246L, acquirer_name#1025, acquirer_type#1027, baseline_median#1264]
+
+(16) Window
+Input [10]: [acquirer_id#8, transaction_date#2, cnp_attempts#1240L, small_ticket_attempts#1242L, invalid_or_expired_declines#1244L, fraud_attempts#1246L, acquirer_name#1025, acquirer_type#1027, baseline_median#1264, _w0#1277]
+Arguments: [avg(_w0#1277) windowspecdefinition(acquirer_id#8, transaction_date#2 ASC NULLS FIRST, specifiedwindowframe(RowFrame, -28, -1)) AS baseline_small_ticket_share#1276], [acquirer_id#8], [transaction_date#2 ASC NULLS FIRST]
+
+(17) Filter
+Input [11]: [acquirer_id#8, transaction_date#2, cnp_attempts#1240L, small_ticket_attempts#1242L, invalid_or_expired_declines#1244L, fraud_attempts#1246L, acquirer_name#1025, acquirer_type#1027, baseline_median#1264, _w0#1277, baseline_small_ticket_share#1276]
+Condition : (isnotnull(invalid_or_expired_declines#1244L) AND ((isnotnull(baseline_median#1264) AND (cast(invalid_or_expired_declines#1244L as double) >= (greatest(baseline_median#1264, 1.0) * 5.0))) AND (invalid_or_expired_declines#1244L >= 20)))
+
+(18) Project
+Output [12]: [acquirer_id#8, acquirer_name#1025, acquirer_type#1027, transaction_date#2, cnp_attempts#1240L, small_ticket_attempts#1242L, invalid_or_expired_declines#1244L, baseline_median#1264 AS baseline_28d_median#1288, round((cast(invalid_or_expired_declines#1244L as double) / greatest(baseline_median#1264, 1.0)), 1) AS multiple_of_baseline#1289, round((cast(small_ticket_attempts#1242L as double) / cast(cnp_attempts#1240L as double)), 3) AS small_ticket_share#1290, round(baseline_small_ticket_share#1276, 3) AS baseline_small_ticket_share#1291, fraud_attempts#1246L]
+Input [11]: [acquirer_id#8, transaction_date#2, cnp_attempts#1240L, small_ticket_attempts#1242L, invalid_or_expired_declines#1244L, fraud_attempts#1246L, acquirer_name#1025, acquirer_type#1027, baseline_median#1264, _w0#1277, baseline_small_ticket_share#1276]
+
+(19) AdaptiveSparkPlan
+Output [12]: [acquirer_id#8, acquirer_name#1025, acquirer_type#1027, transaction_date#2, cnp_attempts#1240L, small_ticket_attempts#1242L, invalid_or_expired_declines#1244L, baseline_28d_median#1288, multiple_of_baseline#1289, small_ticket_share#1290, baseline_small_ticket_share#1291, fraud_attempts#1246L]
+Arguments: isFinalPlan=false
+

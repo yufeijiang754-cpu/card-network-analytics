@@ -1,0 +1,1 @@
+dbt build (50M) took 477s

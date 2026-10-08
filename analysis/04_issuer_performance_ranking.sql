@@ -39,7 +39,7 @@ select
     round(percent_rank() over (order by cnp_approval_rate), 3)                      as cnp_approval_percentile,
     round((cnp_approval_rate - avg(cnp_approval_rate) over ())
           / nullif(stddev_samp(cnp_approval_rate) over (), 0), 2)                   as cnp_approval_zscore,
-    ntile(4) over (order by fraud_loss_bps)                                         as fraud_loss_quartile
+    ntile(4) over (order by fraud_loss_bps, issuer_id)                              as fraud_loss_quartile
 from issuer
 order by cnp_approval_zscore;
 

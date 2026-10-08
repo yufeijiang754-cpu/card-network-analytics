@@ -57,7 +57,7 @@ reasoning behind each. All data in this repository is **synthetic**.
 |----|----------|-----------|
 | D-34 | Analysis SQL lives in `analysis/` as plain SQL against `marts.*`, run by `scripts/run_analysis.py`, which writes CSVs to `analysis/results/`. A file may contain several statements (parts A/B/C). | Analysts can read and run each query directly in any SQL client. Avoided `filter (where ...)` and other DuckDB-only syntax where an ANSI form exists, so the queries port to Snowflake with minimal change. |
 | D-35 | The card-testing detector uses a **trailing 28-day median** baseline, not mean/stddev. | Tested both. Mean/stddev flagged only day 1 because the attack contaminated its own baseline; the median flags all three days. |
-| D-36 | Chargeback alerting requires **rate >= 1% AND >= 5 disputes**, with HIGH when also 3+ sd above MCC peers. | A rate-only rule produced 235 mostly-noise alerts on small merchants. The dual threshold mirrors how network monitoring programs combine ratio and count. |
+| D-36 | Chargeback alerting requires **rate >= 1% AND >= 5 disputes**, with HIGH when also 3+ sd above MCC peers. | A rate-only rule produced 297 mostly-noise alerts on small merchants. The dual threshold mirrors how network monitoring programs combine ratio and count. |
 | D-37 | Generator tweaks made while validating the analysis: the outage issuer is a top-volume issuer, issuer name suffixes match issuer type, and high-chargeback merchants are planted on top-quartile-volume merchants. | The first version planted signals on merchants and issuers too small to be statistically visible (e.g. about 4 auths/hour for the outage issuer). Re-generation needs `dbt build --full-refresh` because `fct_transactions` is incremental on `loaded_at` (see D-22). `run_all.sh` always full-refreshes. |
 | D-38 | `docs/INSIGHTS.md` openly states which patterns were planted. | Honesty about synthetic data. The portfolio value is the detection and quantification method, not the "discovery". |
 
@@ -71,3 +71,14 @@ reasoning behind each. All data in this repository is **synthetic**.
 | D-42 | KPI deltas compare with the **preceding period of equal length**, not a fixed "last month". | Works for any selected date range. |
 | D-43 | Power BI is delivered as a build guide plus Parquet exports (`scripts/export_marts.py`), not a `.pbix`. | A `.pbix` can't be generated or tested headlessly. The guide documents a star schema identical to the dbt marts, plus every DAX measure. |
 | D-44 | Screenshots are taken with Playwright driving local Chrome (`docs/images/`). The Playwright tool lives outside the project requirements. | A real rendered screenshot doubles as a visual layout check. |
+
+## Stage 6 - PySpark
+
+| ID | Decision | Rationale |
+|----|----------|-----------|
+| D-45 | The 50M run uses a **separate** DuckDB file and dbt target path (`scripts/run_50m.sh`); dimensions stay at the same size (D-02). | Keeps the 2M dev warehouse and its artifacts intact, and makes the benchmark measure fact volume only. |
+| D-46 | Spark reads the **marts fact exported to month-partitioned Parquet**, not the raw feed. | The heavy analyses run on the trusted fact. Re-implementing the DQ layer in Spark would test a different thing. The export also demonstrates partition pruning. |
+| D-47 | The three ported jobs are 04A, 05A and 06A: the analyses with the widest aggregations, high-cardinality group-bys and multi-stage windows. | They exercise shuffles, broadcast joins and rolling windows, the Spark concepts worth discussing. |
+| D-48 | Reconciliation compares **row sets exactly**, and floats within one unit of the SQL's rounding precision. `row_number` / `ntile` got deterministic tie-breakers in the SQL. | Two engines can legitimately order ties differently and sum floats in different orders. The tolerance is principled, not arbitrary. In practice every value matched exactly. |
+| D-49 | Exact `percentile(x, 0.5)` in Spark instead of `percentile_approx`. | The approximate version would not reconcile with DuckDB's exact median. Exactness is cheap here (at most 28-row frames). |
+| D-50 | Report that **DuckDB beats Spark local mode** and that shuffle-partition tuning made no measurable difference (median of 3 runs). | Honest benchmarking. The notes explain *why* (single-node engine; tiny post-aggregation shuffle) instead of presenting noise as a finding. |

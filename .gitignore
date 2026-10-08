@@ -22,3 +22,5 @@ logs/
 .env
 dbt/.user.yml
 data/dq_answer_key*.csv
+data/exports_*/
+dbt/target_*/

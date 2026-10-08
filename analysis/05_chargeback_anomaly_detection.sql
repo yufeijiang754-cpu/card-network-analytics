@@ -51,7 +51,7 @@ select
             then 'HIGH: above 1% / 5 disputes and 3+ sd above MCC peers'
         else 'MEDIUM: above 1% / 5 disputes'
     end                                                                   as alert_level,
-    row_number() over (order by cb_rate desc)                             as risk_rank
+    row_number() over (order by cb_rate desc, merchant_id)                as risk_rank
 from scored
 -- Like real network monitoring programs, require BOTH a rate threshold and a minimum
 -- dispute count: a 1% rate on 2 disputes is noise, not a pattern.

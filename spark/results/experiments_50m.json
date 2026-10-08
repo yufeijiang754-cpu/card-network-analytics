@@ -1,0 +1,59 @@
+{
+  "label": "50m",
+  "shuffle_tuning_chargeback_anomaly": [
+    {
+      "shuffle_partitions": 200,
+      "aqe": false,
+      "median_seconds": 5.276,
+      "runs": [
+        4.952,
+        5.276,
+        6.516
+      ]
+    },
+    {
+      "shuffle_partitions": 200,
+      "aqe": true,
+      "median_seconds": 7.345,
+      "runs": [
+        6.236,
+        7.345,
+        7.542
+      ]
+    },
+    {
+      "shuffle_partitions": 16,
+      "aqe": true,
+      "median_seconds": 6.521,
+      "runs": [
+        4.387,
+        6.521,
+        9.443
+      ]
+    },
+    {
+      "shuffle_partitions": 8,
+      "aqe": false,
+      "median_seconds": 4.329,
+      "runs": [
+        4.227,
+        4.329,
+        5.564
+      ]
+    }
+  ],
+  "lazy_evaluation": {
+    "define_plan_seconds": 0.135,
+    "execute_action_seconds": 2.655
+  },
+  "partition_pruning": {
+    "filter_on_partition_column_seconds": 0.291,
+    "filter_on_derived_expression_seconds": 3.868,
+    "partition_filter_in_plan": true,
+    "total_partitions": 12
+  },
+  "caching_two_aggregations_on_cnp_subset": {
+    "without_cache_seconds": 2.638,
+    "with_cache_seconds_after_materialise": 3.733
+  }
+}
