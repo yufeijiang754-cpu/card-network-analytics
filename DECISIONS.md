@@ -37,3 +37,16 @@ reasoning behind each. All data in this repository is **synthetic**.
 | D-23 | Extra marts beyond those requested: `dim_card` and `dim_acquirer`. | Needed for a complete star schema (card product and acquirer slicing in Power BI). |
 | D-24 | Amounts are in **USD** in marts, using a static 2025 FX seed. | Cross-currency aggregation requires one reporting currency. A daily FX table would be the production choice. |
 | D-25 | Business definitions use reusable dbt **doc blocks** (`models/_docs.md`) for metrics like approval rate, fraud loss bps, and interchange. `scripts/check_doc_coverage.py` fails the build if any column lacks a description. | Treats metadata as a governed, tested asset. Every metric has one definition reused across models. |
+
+## Stage 3 - Data quality monitoring
+
+| ID | Decision | Rationale |
+|----|----------|-----------|
+| D-26 | Custom generic tests (`dbt/tests/generic/dq_*.sql`) instead of the built-ins. Each declares `meta.dq_dimension` and returns the **record key** of each failing row. | Built-in `relationships` and `accepted_values` return only the bad value, not the record. Record keys make every failure traceable and scorable against the answer key. |
+| D-27 | Tests on **raw sources warn**; tests on intermediate, marts, DQ models and seeds **error** (path-based `+severity` in `dbt_project.yml`). | Raw data is expected to be dirty; measuring it must not stop the pipeline. Trusted layers must be clean, so a failure blocks the build before BI sees bad data. |
+| D-28 | `dq_results` is written by an **on-run-end hook** (`macros/dq_results.sql`) from dbt's `results` object, with total rows counted per tested relation. Plain ANSI DDL/DML. | Works for `dbt test` and `dbt build`, on DuckDB and Snowflake, with no external orchestrator. History accumulates across runs for trend analysis. |
+| D-29 | Two signals per check: dbt `status` (any failure) and `threshold_status` (pass rate vs. per-dimension tolerance). | Mirrors real DQ operations: not every defect is an incident. Thresholds are vars, overridable per check with `meta.dq_threshold`. |
+| D-30 | `store_failures: true` for all tests (schema `dq_audit`). | Failing rows are kept for drill-down in the dashboard and for answer-key scoring. |
+| D-31 | Timeliness uses ingestion time as the reference: future events (5-minute grace), late arrival (24 h), and recency against a fixed `dq_as_of_ts` var. | The dataset is historical, so wall-clock comparisons would be meaningless. Leaving `dq_as_of_ts` unset in production uses `current_timestamp`. |
+| D-32 | Detection is scored at **(record, issue type, column)** level, with recall per issue and precision per test, and every miss is explained automatically. | A detection rate is only useful if it is precise about *what* was detected and *why* something was missed. |
+| D-33 | The MCC check uses both a format test and a reference-list test. | Shows that format validity (`[0-9]{4}`) is not domain validity: 99 of 300 invalid MCCs are well-formed. |

@@ -23,38 +23,82 @@ sources:
         columns:
           - name: transaction_id
             description: "Network-assigned identifier of the authorization message. Expected to be unique."
+            data_tests:
+              - dq_not_null: {key_column: transaction_id}
+              - dq_unique
           - name: timestamp
             description: "Event time (UTC) at which the authorization request was made at the terminal / gateway."
+            data_tests:
+              - dq_not_null: {key_column: transaction_id}
+              - dq_not_in_future: {reference_column: _loaded_at, key_column: transaction_id, grace_minutes: 5}
+              - dq_max_latency: {reference_column: _loaded_at, key_column: transaction_id, max_hours: 24}
           - name: card_id
             description: "Tokenized card identifier (surrogate for the PAN; no real card numbers are used)."
+            data_tests:
+              - dq_not_null: {key_column: transaction_id}
+              - dq_referential_integrity: {to: "source('raw', 'cardholders')", field: card_id, key_column: transaction_id}
           - name: merchant_id
             description: "Identifier of the card acceptor (merchant) assigned by the acquirer."
+            data_tests:
+              - dq_not_null: {key_column: transaction_id}
+              - dq_referential_integrity: {to: "source('raw', 'merchants')", field: merchant_id, key_column: transaction_id}
           - name: issuer_id
             description: "Identifier of the issuing institution that owns the card account and makes the approve/decline decision."
+            data_tests:
+              - dq_not_null: {key_column: transaction_id}
+              - dq_referential_integrity: {to: "source('raw', 'issuers')", field: issuer_id, key_column: transaction_id}
           - name: acquirer_id
             description: "Identifier of the acquiring institution that holds the merchant relationship."
+            data_tests:
+              - dq_not_null: {key_column: transaction_id}
+              - dq_referential_integrity: {to: "source('raw', 'acquirers')", field: acquirer_id, key_column: transaction_id}
           - name: amount
             description: "Requested authorization amount in transaction currency. Must be >= 0."
+            data_tests:
+              - dq_not_null: {key_column: transaction_id}
+              - dq_value_in_range: {min_value: 0, key_column: transaction_id}
           - name: currency
             description: "ISO 4217 alphabetic currency code of the transaction (raw, may be malformed)."
+            data_tests:
+              - dq_not_null: {key_column: transaction_id}
+              - dq_matches_pattern: {pattern: '[A-Z]{3}', key_column: transaction_id}
+              - dq_in_reference_list: {to: "ref('currencies')", field: currency_code, key_column: transaction_id}
           - name: channel
             description: "card_present (chip / swipe / contactless at a terminal) or card_not_present (e-commerce, app, phone)."
+            data_tests:
+              - dq_not_null: {key_column: transaction_id}
+              - dq_accepted_values: {values: ['card_present', 'card_not_present'], key_column: transaction_id}
           - name: is_cross_border
             description: "True when the issuer country differs from the merchant country."
+            data_tests:
+              - dq_not_null: {key_column: transaction_id}
           - name: auth_response_code
             description: "ISO 8583 field 39 style response code returned by the issuer ('00' = approved)."
+            data_tests:
+              - dq_not_null: {key_column: transaction_id}
+              - dq_in_reference_list: {to: "ref('auth_response_codes')", field: response_code, key_column: transaction_id}
           - name: is_approved
             description: "True when the authorization was approved (response code '00')."
+            data_tests:
+              - dq_not_null: {key_column: transaction_id}
+              - dq_expression_is_true: {expression: "is_approved = (auth_response_code = '00')", key_column: transaction_id, dimension: consistency}
           - name: decline_reason
             description: "Human-readable decline reason; NULL for approved transactions."
+            data_tests:
+              - dq_not_null: {key_column: transaction_id, condition: 'not is_approved'}
           - name: interchange_fee
             description: "Interchange fee in transaction currency, paid by the acquirer to the issuer. Zero for declines."
+            data_tests:
+              - dq_value_in_range: {min_value: 0, key_column: transaction_id}
           - name: is_fraud
             description: "True when the transaction was later confirmed as fraudulent (attempted fraud, approved or declined)."
           - name: is_chargeback
             description: "True when the cardholder or issuer later disputed the approved transaction (chargeback raised)."
           - name: _loaded_at
             description: "Ingestion timestamp (UTC) when the record landed in the data platform."
+            data_tests:
+              - dq_not_null: {key_column: transaction_id}
+              - dq_recency: {max_age_hours: 36}
 
       - name: merchants
         description: "Merchant master data maintained by acquirers (one row per merchant)."
@@ -64,14 +108,25 @@ sources:
         columns:
           - name: merchant_id
             description: "Merchant identifier (primary key)."
+            data_tests:
+              - dq_not_null: {key_column: merchant_id}
+              - dq_unique
           - name: merchant_name
             description: "Doing-business-as name of the merchant (synthetic)."
           - name: mcc
             description: "ISO 18245 Merchant Category Code assigned by the acquirer (raw, may be invalid)."
+            data_tests:
+              - dq_not_null: {key_column: merchant_id}
+              - dq_matches_pattern: {pattern: '[0-9]{4}', key_column: merchant_id}
+              - dq_in_reference_list: {to: "ref('mcc_codes')", field: mcc, key_column: merchant_id}
           - name: country_code
             description: "ISO 3166-1 alpha-2 country where the merchant is located."
+            data_tests:
+              - dq_in_reference_list: {to: "ref('countries')", field: country_code, key_column: merchant_id}
           - name: acquirer_id
             description: "Acquirer that onboarded the merchant."
+            data_tests:
+              - dq_referential_integrity: {to: "source('raw', 'acquirers')", field: acquirer_id, key_column: merchant_id}
           - name: onboarding_date
             description: "Date the merchant started accepting cards on the network."
 
@@ -84,16 +139,25 @@ sources:
         columns:
           - name: card_id
             description: "Tokenized card identifier (primary key)."
+            data_tests:
+              - dq_not_null: {key_column: card_id}
+              - dq_unique
           - name: issuer_id
             description: "Issuer of the card."
+            data_tests:
+              - dq_referential_integrity: {to: "source('raw', 'issuers')", field: issuer_id, key_column: card_id}
           - name: home_country
             description: "Country of the issuing account (drives cross-border classification)."
           - name: card_type
             description: "Credit or Debit."
+            data_tests:
+              - dq_accepted_values: {values: ['Credit', 'Debit'], key_column: card_id}
           - name: card_product
             description: "Product tier: Classic, Rewards, Premium, Business (credit) or Debit."
           - name: credit_limit
             description: "Credit line in USD for credit cards; NULL for debit cards."
+            data_tests:
+              - dq_expression_is_true: {expression: "(card_type = 'Debit') = (credit_limit is null)", key_column: card_id, dimension: consistency}
           - name: card_open_date
             description: "Date the card account was opened."
 
@@ -105,6 +169,9 @@ sources:
         columns:
           - name: issuer_id
             description: "Issuer identifier (primary key)."
+            data_tests:
+              - dq_not_null: {key_column: issuer_id}
+              - dq_unique
           - name: issuer_name
             description: "Issuer legal / brand name (fictional)."
           - name: country_code
@@ -126,6 +193,9 @@ sources:
         columns:
           - name: acquirer_id
             description: "Acquirer identifier (primary key)."
+            data_tests:
+              - dq_not_null: {key_column: acquirer_id}
+              - dq_unique
           - name: acquirer_name
             description: "Acquirer name (fictional)."
           - name: country_code

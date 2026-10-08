@@ -15,6 +15,17 @@ vars:
   dq_future_grace_minutes: 5
   # Timeliness: max tolerated ingestion latency before a record counts as late-arriving.
   dq_max_latency_hours: 24
+  # As-of time for freshness checks. The synthetic feed ends 2025-12-31, so we evaluate it
+  # "as of" the next morning; in production leave unset to compare with current_timestamp.
+  dq_as_of_ts: "2026-01-01 06:00:00"
+  # Pass-rate thresholds per DQ dimension (see docs/DATA_QUALITY_SCORECARD.md).
+  dq_thresholds:
+    completeness: 0.9995
+    uniqueness: 0.9999
+    validity: 0.999
+    timeliness: 0.9995
+    referential_integrity: 0.9995
+    consistency: 0.9999
   # Date spine boundaries for dim_date.
   dim_date_start: "2024-01-01"
   dim_date_end: "2026-12-31"
@@ -51,8 +62,11 @@ seeds:
 
 data_tests:
   card_network:
-    +store_failures: true
+    +store_failures: true      # failing rows kept in dq_audit.* for drill-down and scoring
     +schema: dq_audit
+    +severity: error           # trusted layers (intermediate, marts, dq, seeds): any failure is an error
+    staging:
+      +severity: warn          # raw-source tests are EXPECTED to find defects; they must not stop the run
 
 on-run-start:
   - "{{ create_dq_results_table() }}"
