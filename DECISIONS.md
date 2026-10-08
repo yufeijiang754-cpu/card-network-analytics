@@ -60,3 +60,14 @@ reasoning behind each. All data in this repository is **synthetic**.
 | D-36 | Chargeback alerting requires **rate >= 1% AND >= 5 disputes**, with HIGH when also 3+ sd above MCC peers. | A rate-only rule produced 235 mostly-noise alerts on small merchants. The dual threshold mirrors how network monitoring programs combine ratio and count. |
 | D-37 | Generator tweaks made while validating the analysis: the outage issuer is a top-volume issuer, issuer name suffixes match issuer type, and high-chargeback merchants are planted on top-quartile-volume merchants. | The first version planted signals on merchants and issuers too small to be statistically visible (e.g. about 4 auths/hour for the outage issuer). Re-generation needs `dbt build --full-refresh` because `fct_transactions` is incremental on `loaded_at` (see D-22). `run_all.sh` always full-refreshes. |
 | D-38 | `docs/INSIGHTS.md` openly states which patterns were planted. | Honesty about synthetic data. The portfolio value is the detection and quantification method, not the "discovery". |
+
+## Stage 5 - Dashboard
+
+| ID | Decision | Rationale |
+|----|----------|-----------|
+| D-39 | Streamlit multipage app (`st.navigation`) with Plotly. All data access goes through `dashboard/db.py`: a read-only DuckDB connection with cached, **parameterized** queries. | One swap point for Snowflake. Parameter binding avoids SQL injection from filter values. Read-only means the dashboard can never alter the warehouse. |
+| D-40 | Network Performance queries `fct_transactions` directly, not the aggregates. | Filters span MCC, channel and issuer; a pre-aggregate at that grain would be close to the fact size. DuckDB aggregates 2M rows in milliseconds. In Snowflake, the same pattern would sit on a clustered fact or a dynamic table. |
+| D-41 | Chart conventions: fixed categorical order (the same entity always gets the same colour), no dual axes (volume and approval rate are separate charts), a truncated axis is labelled in the chart title, and status is always icon + label, never colour alone. | Avoids the most common dashboard misreads. Colour stability means filtering never repaints a series. |
+| D-42 | KPI deltas compare with the **preceding period of equal length**, not a fixed "last month". | Works for any selected date range. |
+| D-43 | Power BI is delivered as a build guide plus Parquet exports (`scripts/export_marts.py`), not a `.pbix`. | A `.pbix` can't be generated or tested headlessly. The guide documents a star schema identical to the dbt marts, plus every DAX measure. |
+| D-44 | Screenshots are taken with Playwright driving local Chrome (`docs/images/`). The Playwright tool lives outside the project requirements. | A real rendered screenshot doubles as a visual layout check. |
