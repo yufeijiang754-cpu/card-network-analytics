@@ -30,13 +30,14 @@ step "3/8  dbt: seeds, models, tests (full refresh)"
 mkdir -p warehouse
 ( cd dbt && "$DBT" build --profiles-dir . --full-refresh )
 
-step "4/8  dbt docs, lineage export and documentation coverage"
+# Score DQ immediately: it reads dbt's run_results.json, which `dbt docs generate` overwrites.
+step "4/8  Data-quality detection report vs. answer key"
+"$PY" dq/compare_answer_key.py
+
+step "5/8  dbt docs, lineage export and documentation coverage"
 ( cd dbt && "$DBT" docs generate --profiles-dir . > /dev/null )
 "$PY" scripts/export_lineage.py
 "$PY" scripts/check_doc_coverage.py
-
-step "5/8  Data-quality detection report vs. answer key"
-"$PY" dq/compare_answer_key.py
 
 step "6/8  Business analysis SQL"
 "$PY" scripts/run_analysis.py --quiet

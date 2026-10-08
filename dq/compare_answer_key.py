@@ -96,6 +96,11 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
 
     tests = load_source_tests(Path(args.target))
+    if tests.empty or not (tests.layer == "raw").any():
+        print("No dbt test results found in dbt/target/run_results.json. Run `dbt build` or `dbt test` "
+              "right before this script (other dbt commands such as `docs generate` overwrite run_results).",
+              file=sys.stderr)
+        return 1
     tests["issue_type"] = [issue_for_test(t, tb, c) for t, tb, c in zip(tests.test_type, tests.table, tests.column)]
     con = duckdb.connect(args.db)
 
