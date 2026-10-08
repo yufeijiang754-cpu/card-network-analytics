@@ -1,0 +1,8 @@
+currency_code,numeric_code,currency_symbol,usd_rate,minor_units
+USD,840,US$,1.0,2
+CAD,124,C$,0.73,2
+MXN,484,MX$,0.055,2
+GBP,826,£,1.27,2
+EUR,978,€,1.08,2
+JPY,392,¥,0.0067,0
+AUD,036,A$,0.66,2

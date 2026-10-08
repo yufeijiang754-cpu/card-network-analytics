@@ -1,0 +1,65 @@
+version: 2
+
+seeds:
+  - name: mcc_codes
+    description: "ISO 18245 Merchant Category Codes used on the network, with reporting category and risk tier."
+    columns:
+      - name: mcc
+        description: "4-digit MCC (primary key)."
+        data_tests: [unique, not_null]
+      - name: mcc_description
+        description: "Official MCC description."
+      - name: mcc_category
+        description: "{{ doc('mcc_category') }}"
+      - name: risk_tier
+        description: "Network risk tier for the category (low / medium / high)."
+  - name: currencies
+    description: "Supported ISO 4217 currencies with numeric code, symbol and static 2025 USD conversion rate (synthetic)."
+    columns:
+      - name: currency_code
+        description: "ISO 4217 alpha code (primary key)."
+        data_tests: [unique, not_null]
+      - name: numeric_code
+        description: "ISO 4217 numeric code (e.g. 840 = USD)."
+      - name: currency_symbol
+        description: "Common symbol / prefix (e.g. US$)."
+      - name: usd_rate
+        description: "USD value of one unit of the currency."
+      - name: minor_units
+        description: "Decimal places used by the currency (JPY = 0)."
+  - name: auth_response_codes
+    description: "ISO 8583 style authorization response codes with decline reason, category and soft/hard type."
+    columns:
+      - name: response_code
+        description: "2-character response code (primary key)."
+        data_tests: [unique, not_null]
+      - name: response_description
+        description: "Technical description of the code."
+      - name: decline_reason
+        description: "Business-friendly decline reason (NULL for approved)."
+      - name: is_approved
+        description: "True only for code 00."
+      - name: decline_category
+        description: "Grouping of decline reasons."
+      - name: decline_type
+        description: "{{ doc('decline_type') }}"
+  - name: countries
+    description: "Countries present on the network with region and local currency."
+    columns:
+      - name: country_code
+        description: "ISO 3166-1 alpha-2 code (primary key)."
+        data_tests: [unique, not_null]
+      - name: country_name
+        description: "Country name."
+      - name: region
+        description: "Reporting region."
+      - name: currency_code
+        description: "Local currency."
+  - name: us_holidays
+    description: "US federal holidays and major retail days in 2025 used for seasonality analysis."
+    columns:
+      - name: holiday_date
+        description: "Date (primary key)."
+        data_tests: [unique, not_null]
+      - name: holiday_name
+        description: "Holiday name."

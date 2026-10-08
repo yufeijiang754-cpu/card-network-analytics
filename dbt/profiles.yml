@@ -1,0 +1,31 @@
+# dbt profiles for this project. Run dbt with `--profiles-dir .` from this folder
+# (run_all.sh / Makefile do this for you), or set DBT_PROFILES_DIR.
+card_network:
+  target: "{{ env_var('DBT_TARGET', 'dev') }}"
+  outputs:
+    # Default: local, zero-cost DuckDB warehouse file.
+    dev:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', '../warehouse/payments.duckdb') }}"
+      schema: main
+      threads: 4
+      settings:
+        memory_limit: "{{ env_var('DUCKDB_MEMORY_LIMIT', '4GB') }}"
+
+    # Snowflake: fill in env vars (see docs/SNOWFLAKE_SETUP.md), then
+    #   DBT_TARGET=snowflake dbt build --profiles-dir .
+    # Requires `pip install dbt-snowflake==1.8.4`.
+    snowflake:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'not_set') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', 'not_set') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', '') }}"
+      # Key-pair auth (recommended) instead of password:
+      # private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', '') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'TRANSFORMER') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'TRANSFORM_WH') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'PAYMENTS_ANALYTICS') }}"
+      schema: "{{ env_var('SNOWFLAKE_SCHEMA', 'DBT') }}"
+      threads: 8
+      client_session_keep_alive: false
+      query_tag: card_network_dbt

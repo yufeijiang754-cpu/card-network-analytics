@@ -1,0 +1,189 @@
+version: 2
+
+models:
+  - name: int_merchants__classified
+    description: >
+      Merchants joined to the ISO 18245 MCC reference. Merchants with an MCC outside the
+      reference list are kept (their transactions are real sales) but labelled
+      'Unclassified' and flagged with is_valid_mcc = false for data-steward follow-up.
+    meta: {owner: "Merchant Data Stewardship", layer: intermediate, grain: "one row per merchant"}
+    columns:
+      - name: merchant_id
+        description: "Merchant identifier (primary key)."
+      - name: merchant_name
+        description: "Merchant name."
+      - name: mcc
+        description: "{{ doc('mcc') }}"
+      - name: mcc_description
+        description: "ISO 18245 description of the MCC (NULL when invalid)."
+      - name: mcc_category
+        description: "{{ doc('mcc_category') }}"
+      - name: mcc_risk_tier
+        description: "Network risk tier of the MCC (low / medium / high; 'unknown' when invalid)."
+      - name: is_valid_mcc
+        description: "True when the merchant's MCC exists in the reference list."
+      - name: country_code
+        description: "Merchant country."
+      - name: acquirer_id
+        description: "Acquirer of the merchant."
+      - name: onboarding_date
+        description: "Merchant onboarding date."
+
+  - name: int_transactions__dq_flagged
+    description: >
+      **Central data-quality policy model.** Every raw authorization record with one boolean
+      flag per DQ rule, a list of violated rules, and a routing decision (`dq_status`).
+      Currency values are resolved from alpha, numeric (840) or symbol (US$) formats to ISO
+      alpha codes. Duplicates are classified as exact replays (safe to drop) or id collisions
+      (different content under the same id, so quarantined and escalated).
+    meta: {owner: "Data Quality", layer: intermediate, grain: "one row per raw authorization record"}
+    columns:
+      - name: transaction_id
+        description: "Authorization identifier (may repeat for duplicates)."
+      - name: transaction_ts
+        description: "Event timestamp (UTC)."
+      - name: transaction_date
+        description: "{{ doc('transaction_date') }}"
+      - name: loaded_at
+        description: "{{ doc('loaded_at') }}"
+      - name: load_date
+        description: "Ingestion date (partition used for DQ trend monitoring)."
+      - name: card_id
+        description: "Card identifier as received."
+      - name: merchant_id
+        description: "Merchant identifier as received."
+      - name: issuer_id
+        description: "Issuer identifier as received."
+      - name: acquirer_id
+        description: "Acquirer identifier as received."
+      - name: amount_local
+        description: "Amount in transaction currency."
+      - name: currency_raw
+        description: "Currency exactly as received."
+      - name: currency_code
+        description: "Resolved ISO 4217 alpha code (NULL when it cannot be resolved)."
+      - name: channel
+        description: "{{ doc('channel') }}"
+      - name: is_cross_border
+        description: "{{ doc('is_cross_border') }}"
+      - name: auth_response_code
+        description: "{{ doc('auth_response_code') }}"
+      - name: is_approved
+        description: "Approval flag as received."
+      - name: decline_reason_raw
+        description: "Decline reason as received."
+      - name: interchange_fee_local
+        description: "Interchange fee in transaction currency."
+      - name: is_fraud
+        description: "{{ doc('is_fraud') }}"
+      - name: is_chargeback
+        description: "{{ doc('is_chargeback') }}"
+      - name: id_occurrence
+        description: "1-based occurrence number of this transaction_id ordered by loaded_at (1 = first arrival)."
+      - name: id_count
+        description: "Number of raw records sharing this transaction_id."
+      - name: dq_missing_critical_field
+        description: "Completeness: a field required for processing (timestamp, card, merchant, amount, currency, response code, channel, approval flag) is NULL. Blocking."
+      - name: dq_missing_decline_reason
+        description: "Completeness (conditional): declined transaction without decline reason. Repairable from the response-code reference."
+      - name: dq_is_replay_copy
+        description: "Uniqueness: a later exact copy of an earlier message (same id and content). Dropped."
+      - name: dq_is_id_collision
+        description: "Uniqueness: the same id carries different business content. All copies are quarantined."
+      - name: dq_negative_amount
+        description: "Validity: authorization amount < 0. Blocking (refunds are a different message type)."
+      - name: dq_unrecognized_currency
+        description: "Validity: the currency cannot be resolved to a supported ISO code. Blocking."
+      - name: dq_currency_reformatted
+        description: "Validity: the currency was received in a non-standard format (lowercase, padded, numeric, symbol) and standardized. Repaired."
+      - name: dq_invalid_channel
+        description: "Validity: channel is not card_present / card_not_present. Blocking."
+      - name: dq_inconsistent_approval
+        description: "Validity / consistency: is_approved disagrees with response code (approved <=> '00'). Blocking."
+      - name: dq_future_timestamp
+        description: "Timeliness: event timestamp is later than ingestion time + grace (dq_future_grace_minutes). Blocking."
+      - name: dq_orphan_merchant
+        description: "Referential integrity: merchant_id not found in merchant master. Blocking."
+      - name: dq_orphan_card
+        description: "Referential integrity: card_id not found in card master. Blocking."
+      - name: dq_orphan_issuer
+        description: "Referential integrity: issuer_id not found in issuer master. Blocking."
+      - name: dq_orphan_acquirer
+        description: "Referential integrity: acquirer_id not found in acquirer master. Blocking."
+      - name: dq_issuer_mismatch
+        description: "Consistency: transaction issuer differs from the issuer that owns the card. Blocking."
+      - name: dq_status
+        description: "{{ doc('dq_status') }}"
+      - name: dq_issues
+        description: "{{ doc('dq_issues') }}"
+
+  - name: int_transactions__enriched
+    description: >
+      Trusted authorizations (dq_status valid or repaired) joined to merchant, card, issuer and
+      reference data, with USD conversion. Input to the fact table.
+    meta: {owner: "Network Analytics", layer: intermediate, grain: "one row per trusted authorization"}
+    columns:
+      - name: transaction_id
+        description: "Authorization identifier (unique from here on)."
+      - name: transaction_ts
+        description: "Event timestamp (UTC)."
+      - name: transaction_date
+        description: "{{ doc('transaction_date') }}"
+      - name: transaction_hour
+        description: "Hour of day (0-23, UTC) of the event."
+      - name: loaded_at
+        description: "{{ doc('loaded_at') }}"
+      - name: card_id
+        description: "Card identifier."
+      - name: merchant_id
+        description: "Merchant identifier."
+      - name: issuer_id
+        description: "Issuer identifier."
+      - name: acquirer_id
+        description: "Acquirer identifier."
+      - name: mcc
+        description: "{{ doc('mcc') }}"
+      - name: mcc_category
+        description: "{{ doc('mcc_category') }}"
+      - name: merchant_country
+        description: "Merchant country."
+      - name: card_country
+        description: "Card issuing country."
+      - name: card_type
+        description: "Credit or Debit."
+      - name: card_product
+        description: "Card product tier."
+      - name: channel
+        description: "{{ doc('channel') }}"
+      - name: is_cross_border
+        description: "{{ doc('is_cross_border') }}"
+      - name: currency_code
+        description: "Standardized ISO 4217 alpha currency code."
+      - name: amount_local
+        description: "Amount in transaction currency."
+      - name: amount_usd
+        description: "{{ doc('amount_usd') }}"
+      - name: interchange_fee_local
+        description: "Interchange fee in transaction currency."
+      - name: interchange_fee_usd
+        description: "{{ doc('interchange_fee_usd') }}"
+      - name: auth_response_code
+        description: "{{ doc('auth_response_code') }}"
+      - name: is_approved
+        description: "True when approved."
+      - name: decline_reason
+        description: "Decline reason; filled from the response-code reference when missing in the feed."
+      - name: decline_category
+        description: "Grouping of decline reasons (Financial, Issuer Discretion, Card Status, Fraud / Risk, Technical, Policy, Cardholder Verification)."
+      - name: decline_type
+        description: "{{ doc('decline_type') }}"
+      - name: is_fraud
+        description: "{{ doc('is_fraud') }}"
+      - name: is_chargeback
+        description: "{{ doc('is_chargeback') }}"
+      - name: is_regulated_debit_txn
+        description: "True for domestic debit transactions on a Reg II regulated issuer (interchange capped)."
+      - name: dq_status
+        description: "{{ doc('dq_status') }}"
+      - name: dq_issues
+        description: "{{ doc('dq_issues') }}"

@@ -1,0 +1,60 @@
+name: card_network
+version: "1.0.0"
+config-version: 2
+profile: card_network
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+docs-paths: ["models"]
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # Timeliness: tolerated clock skew between event time and ingestion time.
+  dq_future_grace_minutes: 5
+  # Timeliness: max tolerated ingestion latency before a record counts as late-arriving.
+  dq_max_latency_hours: 24
+  # Date spine boundaries for dim_date.
+  dim_date_start: "2024-01-01"
+  dim_date_end: "2026-12-31"
+
+models:
+  card_network:
+    +persist_docs:
+      relation: true
+      columns: true
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: table
+      +schema: intermediate
+    marts:
+      +materialized: table
+      +schema: marts
+    data_quality:
+      +materialized: table
+      +schema: dq
+
+seeds:
+  card_network:
+    +schema: reference
+    mcc_codes:
+      +column_types: {mcc: varchar}
+    auth_response_codes:
+      +column_types: {response_code: varchar, is_approved: boolean}
+    currencies:
+      +column_types: {currency_code: varchar, numeric_code: varchar, currency_symbol: varchar, usd_rate: double, minor_units: integer}
+    us_holidays:
+      +column_types: {holiday_date: date}
+
+data_tests:
+  card_network:
+    +store_failures: true
+    +schema: dq_audit
+
+on-run-start:
+  - "{{ create_dq_results_table() }}"
+on-run-end:
+  - "{{ log_dq_results(results) }}"

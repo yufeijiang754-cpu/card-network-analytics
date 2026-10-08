@@ -1,0 +1,11 @@
+response_code,response_description,decline_reason,is_approved,decline_category,decline_type
+00,Approved,,true,Approved,
+51,Insufficient funds,Insufficient Funds,false,Financial,soft
+05,Do not honor,Do Not Honor,false,Issuer Discretion,soft
+61,Exceeds withdrawal amount limit,Exceeds Limit,false,Financial,soft
+54,Expired card,Expired Card,false,Card Status,hard
+55,Incorrect PIN,Incorrect PIN,false,Cardholder Verification,soft
+57,Transaction not permitted to cardholder,Transaction Not Permitted,false,Policy,hard
+14,Invalid card number,Invalid Card Number,false,Card Status,hard
+91,Issuer or switch inoperative,Issuer Unavailable,false,Technical,soft
+59,Suspected fraud,Suspected Fraud,false,Fraud / Risk,hard

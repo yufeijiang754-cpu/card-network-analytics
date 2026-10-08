@@ -1,0 +1,326 @@
+version: 2
+
+models:
+  - name: fct_transactions
+    description: >
+      **Authorization fact table** (star-schema center). One row per trusted, deduplicated
+      authorization attempt, approved or declined. Built incrementally on ingestion time
+      (`loaded_at`). Joins to dim_date (transaction_date), dim_merchant, dim_issuer,
+      dim_acquirer and dim_card. Quarantined records are excluded; see dq.dq_transaction_quarantine.
+    meta:
+      owner: "Network Analytics"
+      layer: marts
+      grain: "one row per authorization attempt"
+      refresh: "incremental on loaded_at"
+    columns:
+      - name: transaction_id
+        description: "Authorization identifier (primary key)."
+        data_tests: [unique, not_null]
+      - name: transaction_ts
+        description: "Event timestamp (UTC)."
+        data_tests: [not_null]
+      - name: transaction_date
+        description: "{{ doc('transaction_date') }} FK to dim_date."
+        data_tests:
+          - not_null
+          - relationships: {to: ref('dim_date'), field: date_day}
+      - name: transaction_hour
+        description: "Hour of day (0-23, UTC)."
+      - name: loaded_at
+        description: "{{ doc('loaded_at') }}"
+      - name: card_id
+        description: "FK to dim_card."
+        data_tests:
+          - not_null
+          - relationships: {to: ref('dim_card'), field: card_id}
+      - name: merchant_id
+        description: "FK to dim_merchant."
+        data_tests:
+          - not_null
+          - relationships: {to: ref('dim_merchant'), field: merchant_id}
+      - name: issuer_id
+        description: "FK to dim_issuer."
+        data_tests:
+          - not_null
+          - relationships: {to: ref('dim_issuer'), field: issuer_id}
+      - name: acquirer_id
+        description: "FK to dim_acquirer."
+        data_tests:
+          - not_null
+          - relationships: {to: ref('dim_acquirer'), field: acquirer_id}
+      - name: mcc
+        description: "{{ doc('mcc') }} Denormalized from dim_merchant for query convenience."
+      - name: mcc_category
+        description: "{{ doc('mcc_category') }}"
+      - name: channel
+        description: "{{ doc('channel') }}"
+        data_tests:
+          - accepted_values: {values: ['card_present', 'card_not_present']}
+      - name: is_cross_border
+        description: "{{ doc('is_cross_border') }}"
+        data_tests: [not_null]
+      - name: card_type
+        description: "Credit or Debit."
+      - name: card_product
+        description: "Card product tier."
+      - name: currency_code
+        description: "Standardized ISO 4217 alpha currency code."
+        data_tests:
+          - accepted_values: {values: ['USD', 'CAD', 'MXN', 'GBP', 'EUR', 'JPY', 'AUD']}
+      - name: amount_local
+        description: "Amount in transaction currency."
+      - name: amount_usd
+        description: "{{ doc('amount_usd') }}"
+        data_tests: [not_null]
+      - name: interchange_fee_local
+        description: "Interchange fee in transaction currency."
+      - name: interchange_fee_usd
+        description: "{{ doc('interchange_fee_usd') }}"
+      - name: auth_response_code
+        description: "{{ doc('auth_response_code') }}"
+      - name: is_approved
+        description: "True when approved (response code 00)."
+        data_tests: [not_null]
+      - name: decline_reason
+        description: "Decline reason (NULL for approvals)."
+      - name: decline_category
+        description: "Decline reason grouping."
+      - name: decline_type
+        description: "{{ doc('decline_type') }}"
+      - name: is_fraud
+        description: "{{ doc('is_fraud') }}"
+      - name: is_chargeback
+        description: "{{ doc('is_chargeback') }}"
+      - name: is_regulated_debit_txn
+        description: "True for domestic debit on a Reg II regulated issuer."
+      - name: approved_amount_usd
+        description: "amount_usd when approved, else 0. Additive base for approved-volume KPIs."
+      - name: fraud_loss_amount_usd
+        description: "amount_usd when approved AND fraudulent, else 0. Numerator of the fraud loss rate."
+      - name: chargeback_amount_usd
+        description: "amount_usd when a chargeback was raised, else 0."
+      - name: dq_status
+        description: "{{ doc('dq_status') }} Only 'valid' or 'repaired' in this table."
+        data_tests:
+          - accepted_values: {values: ['valid', 'repaired']}
+
+  - name: dim_date
+    description: "Calendar dimension (2024-2026) with weekend and US holiday flags."
+    meta: {owner: "Network Analytics", layer: marts, grain: "one row per calendar day"}
+    columns:
+      - name: date_day
+        description: "Calendar date (primary key)."
+        data_tests: [unique, not_null]
+      - name: year_number
+        description: "Calendar year."
+      - name: quarter_number
+        description: "Calendar quarter (1-4)."
+      - name: month_number
+        description: "Calendar month (1-12)."
+      - name: month_start_date
+        description: "First day of the month, used for monthly roll-ups."
+      - name: day_of_month
+        description: "Day of month (1-31)."
+      - name: iso_day_of_week
+        description: "ISO day of week, Monday = 1 ... Sunday = 7."
+      - name: day_name
+        description: "Weekday name."
+      - name: is_weekend
+        description: "True on Saturday and Sunday."
+      - name: is_us_holiday
+        description: "True on US federal holidays and major retail days (Black Friday, Cyber Monday, Christmas Eve, ...)."
+      - name: holiday_name
+        description: "Name of the holiday (NULL otherwise)."
+      - name: is_peak_day
+        description: "Weekend or holiday: days with structurally higher volume."
+
+  - name: dim_merchant
+    description: "Merchant dimension with MCC classification, location and acquirer attributes."
+    meta: {owner: "Merchant Data Stewardship", layer: marts, grain: "one row per merchant"}
+    columns:
+      - name: merchant_id
+        description: "Merchant identifier (primary key)."
+        data_tests: [unique, not_null]
+      - name: merchant_name
+        description: "Merchant name."
+      - name: mcc
+        description: "{{ doc('mcc') }}"
+      - name: mcc_description
+        description: "ISO 18245 description of the MCC."
+      - name: mcc_category
+        description: "{{ doc('mcc_category') }}"
+      - name: mcc_risk_tier
+        description: "MCC risk tier (low / medium / high / unknown)."
+      - name: is_valid_mcc
+        description: "False when the MCC failed validation (merchant classified as 'Unclassified')."
+      - name: merchant_country
+        description: "Merchant country code."
+      - name: merchant_country_name
+        description: "Merchant country name."
+      - name: merchant_region
+        description: "Merchant region (North America, Europe, ...)."
+      - name: acquirer_id
+        description: "Acquirer of the merchant."
+      - name: acquirer_name
+        description: "Acquirer name."
+      - name: acquirer_type
+        description: "Bank, Processor or Payment Facilitator."
+      - name: onboarding_date
+        description: "Merchant onboarding date."
+
+  - name: dim_issuer
+    description: "Issuer dimension with regulatory tier and portfolio size."
+    meta: {owner: "Network Partnerships", layer: marts, grain: "one row per issuer"}
+    columns:
+      - name: issuer_id
+        description: "Issuer identifier (primary key)."
+        data_tests: [unique, not_null]
+      - name: issuer_name
+        description: "Issuer name (fictional)."
+      - name: issuer_country
+        description: "Issuer country code."
+      - name: issuer_country_name
+        description: "Issuer country name."
+      - name: issuer_region
+        description: "Issuer region."
+      - name: issuer_type
+        description: "Bank, Credit Union or Fintech."
+      - name: asset_size_tier
+        description: "Large (>$10B) or Small (<$10B)."
+      - name: is_regulated_debit
+        description: "True when Reg II caps the issuer's debit interchange."
+      - name: onboarded_date
+        description: "Date the issuer joined the network."
+      - name: cards_on_file
+        description: "Number of cards issued (denominator for per-card metrics)."
+      - name: credit_cards_on_file
+        description: "Number of credit cards issued."
+      - name: debit_cards_on_file
+        description: "Number of debit cards issued."
+
+  - name: dim_card
+    description: "Card dimension (tokenized, no PII)."
+    meta: {owner: "Issuer Data Stewardship", layer: marts, grain: "one row per card"}
+    columns:
+      - name: card_id
+        description: "Tokenized card identifier (primary key)."
+        data_tests: [unique, not_null]
+      - name: issuer_id
+        description: "Issuer of the card."
+      - name: card_country
+        description: "Issuing country."
+      - name: card_type
+        description: "Credit or Debit."
+      - name: card_product
+        description: "Product tier."
+      - name: credit_limit_usd
+        description: "Credit line in USD (NULL for debit)."
+      - name: credit_limit_band
+        description: "Credit line band for segmentation."
+      - name: card_open_date
+        description: "Account open date."
+
+  - name: dim_acquirer
+    description: "Acquirer dimension."
+    meta: {owner: "Network Partnerships", layer: marts, grain: "one row per acquirer"}
+    columns:
+      - name: acquirer_id
+        description: "Acquirer identifier (primary key)."
+        data_tests: [unique, not_null]
+      - name: acquirer_name
+        description: "Acquirer name."
+      - name: acquirer_country
+        description: "Acquirer country."
+      - name: acquirer_type
+        description: "Bank, Processor or Payment Facilitator."
+
+  - name: agg_daily_network_metrics
+    description: >
+      Daily network KPIs by channel and cross-border flag. Counts and amounts are additive
+      across rows; rate columns are only valid at this grain (recompute rates from the additive
+      columns when rolling up).
+    meta: {owner: "Network Analytics", layer: marts, grain: "transaction_date x channel x is_cross_border"}
+    data_tests:
+      - dq_unique_combination:
+          columns: ['transaction_date', 'channel', 'is_cross_border']
+    columns:
+      - name: transaction_date
+        description: "{{ doc('transaction_date') }}"
+      - name: channel
+        description: "{{ doc('channel') }}"
+      - name: is_cross_border
+        description: "{{ doc('is_cross_border') }}"
+      - name: transaction_count
+        description: "Authorization attempts."
+      - name: approved_count
+        description: "Approved authorizations."
+      - name: declined_count
+        description: "Declined authorizations."
+      - name: total_amount_usd
+        description: "USD amount of all attempts (approved + declined)."
+      - name: approved_amount_usd
+        description: "USD amount of approved authorizations (approved payment volume)."
+      - name: fraud_attempt_count
+        description: "Attempts later confirmed fraudulent (approved or declined)."
+      - name: fraud_approved_count
+        description: "Fraudulent attempts that were approved (became losses)."
+      - name: fraud_loss_amount_usd
+        description: "USD amount of approved fraud."
+      - name: chargeback_count
+        description: "Approved transactions later charged back."
+      - name: chargeback_amount_usd
+        description: "USD amount charged back."
+      - name: interchange_fee_usd
+        description: "{{ doc('interchange_fee_usd') }}"
+      - name: approval_rate
+        description: "{{ doc('approval_rate') }}"
+        data_tests:
+          - dq_value_in_range: {min_value: 0, max_value: 1}
+      - name: fraud_loss_rate_bps
+        description: "{{ doc('fraud_loss_rate_bps') }}"
+      - name: avg_approved_ticket_usd
+        description: "Average approved transaction size in USD."
+
+  - name: agg_mcc_metrics
+    description: "Monthly KPIs per Merchant Category Code with month-over-month growth."
+    meta: {owner: "Network Analytics", layer: marts, grain: "month x mcc"}
+    data_tests:
+      - dq_unique_combination:
+          columns: ['month_start_date', 'mcc']
+    columns:
+      - name: month_start_date
+        description: "First day of the month."
+      - name: mcc
+        description: "{{ doc('mcc') }}"
+      - name: mcc_category
+        description: "{{ doc('mcc_category') }}"
+      - name: transaction_count
+        description: "Authorization attempts."
+      - name: approved_count
+        description: "Approved authorizations."
+      - name: approved_amount_usd
+        description: "Approved payment volume in USD."
+      - name: cnp_transaction_count
+        description: "Card-not-present attempts."
+      - name: cross_border_transaction_count
+        description: "Cross-border attempts."
+      - name: fraud_attempt_count
+        description: "Fraudulent attempts (approved or declined)."
+      - name: fraud_loss_amount_usd
+        description: "USD amount of approved fraud."
+      - name: chargeback_count
+        description: "Chargebacks raised."
+      - name: interchange_fee_usd
+        description: "{{ doc('interchange_fee_usd') }}"
+      - name: approval_rate
+        description: "{{ doc('approval_rate') }}"
+      - name: avg_approved_ticket_usd
+        description: "Average approved ticket size in USD."
+      - name: fraud_loss_rate_bps
+        description: "{{ doc('fraud_loss_rate_bps') }}"
+      - name: chargeback_rate
+        description: "{{ doc('chargeback_rate') }}"
+      - name: effective_interchange_rate
+        description: "{{ doc('effective_interchange_rate') }}"
+      - name: approved_amount_mom_growth
+        description: "Month-over-month growth of approved USD volume ((this - previous) / previous). NULL for the first month."

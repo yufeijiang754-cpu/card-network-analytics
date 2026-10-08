@@ -1,0 +1,10 @@
+country_code,country_name,region,currency_code
+US,United States,North America,USD
+CA,Canada,North America,CAD
+MX,Mexico,Latin America,MXN
+GB,United Kingdom,Europe,GBP
+DE,Germany,Europe,EUR
+FR,France,Europe,EUR
+ES,Spain,Europe,EUR
+JP,Japan,Asia Pacific,JPY
+AU,Australia,Asia Pacific,AUD

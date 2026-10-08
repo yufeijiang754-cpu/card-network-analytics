@@ -1,0 +1,116 @@
+version: 2
+
+models:
+  - name: stg_transactions
+    description: >
+      Raw authorization messages, renamed and typed. One row per raw record, so duplicates
+      and defects are still present by design. Currency codes get a light
+      `upper(trim())` normalization; everything else is passed through.
+    meta: {owner: "Network Data Engineering", layer: staging, grain: "one row per raw authorization record"}
+    columns:
+      - name: transaction_id
+        description: "Network-assigned authorization identifier. Not yet guaranteed unique at this layer."
+      - name: transaction_ts
+        description: "Event timestamp (UTC) of the authorization request."
+      - name: transaction_date
+        description: "{{ doc('transaction_date') }}"
+      - name: loaded_at
+        description: "{{ doc('loaded_at') }}"
+      - name: card_id
+        description: "Tokenized card identifier (FK to cardholders)."
+      - name: merchant_id
+        description: "Merchant identifier (FK to merchants)."
+      - name: issuer_id
+        description: "Issuing institution identifier (FK to issuers)."
+      - name: acquirer_id
+        description: "Acquiring institution identifier (FK to acquirers)."
+      - name: amount_local
+        description: "Requested authorization amount in transaction currency."
+      - name: currency_raw
+        description: "Currency value exactly as received (may be lowercase, padded, numeric or a symbol)."
+      - name: currency_normalized
+        description: "currency_raw upper-cased and trimmed. Still needs resolving to an ISO alpha code."
+      - name: channel
+        description: "{{ doc('channel') }}"
+      - name: is_cross_border
+        description: "{{ doc('is_cross_border') }}"
+      - name: auth_response_code
+        description: "{{ doc('auth_response_code') }}"
+      - name: is_approved
+        description: "True when the issuer approved the authorization (response code 00)."
+      - name: decline_reason_raw
+        description: "Decline reason text as received. Should be NULL only for approved transactions."
+      - name: interchange_fee_local
+        description: "Interchange fee in transaction currency (0 for declines)."
+      - name: is_fraud
+        description: "{{ doc('is_fraud') }}"
+      - name: is_chargeback
+        description: "{{ doc('is_chargeback') }}"
+
+  - name: stg_merchants
+    description: "Merchant master data from acquirers, typed. MCC is trimmed but not yet validated."
+    meta: {owner: "Merchant Data Stewardship", layer: staging, grain: "one row per merchant"}
+    columns:
+      - name: merchant_id
+        description: "Merchant identifier (primary key)."
+      - name: merchant_name
+        description: "Merchant doing-business-as name (synthetic)."
+      - name: mcc
+        description: "{{ doc('mcc') }}"
+      - name: country_code
+        description: "ISO 3166-1 alpha-2 country of the merchant location."
+      - name: acquirer_id
+        description: "Acquirer holding the merchant relationship."
+      - name: onboarding_date
+        description: "Date the merchant began card acceptance."
+
+  - name: stg_cardholders
+    description: "Card account master data from issuers (tokenized, no PII)."
+    meta: {owner: "Issuer Data Stewardship", layer: staging, grain: "one row per card"}
+    columns:
+      - name: card_id
+        description: "Tokenized card identifier (primary key)."
+      - name: issuer_id
+        description: "Issuer that owns the card account."
+      - name: home_country
+        description: "Issuing country of the card account."
+      - name: card_type
+        description: "Credit or Debit. Drives interchange treatment (Reg II applies to debit only)."
+      - name: card_product
+        description: "Product tier (Classic, Rewards, Premium, Business; 'Debit' for debit cards). Premium tiers earn higher interchange."
+      - name: credit_limit_usd
+        description: "Credit line in USD (NULL for debit cards)."
+      - name: card_open_date
+        description: "Date the card account was opened."
+
+  - name: stg_issuers
+    description: "Issuing institutions participating in the network."
+    meta: {owner: "Network Partnerships", layer: staging, grain: "one row per issuer"}
+    columns:
+      - name: issuer_id
+        description: "Issuer identifier (primary key)."
+      - name: issuer_name
+        description: "Issuer name (fictional)."
+      - name: country_code
+        description: "Issuer home country."
+      - name: issuer_type
+        description: "Bank, Credit Union or Fintech."
+      - name: asset_size_tier
+        description: "Large (>$10B assets) or Small (<$10B)."
+      - name: is_regulated_debit
+        description: "True when US Regulation II (Durbin) caps this issuer's debit interchange."
+      - name: onboarded_date
+        description: "Date the issuer joined the network."
+
+  - name: stg_acquirers
+    description: "Acquirers, processors and payment facilitators."
+    meta: {owner: "Network Partnerships", layer: staging, grain: "one row per acquirer"}
+    columns:
+      - name: acquirer_id
+        description: "Acquirer identifier (primary key)."
+      - name: acquirer_name
+        description: "Acquirer name (fictional)."
+      - name: country_code
+        description: "Acquirer home country."
+      - name: acquirer_type
+        description: "Bank, Processor or Payment Facilitator (PayFac onboards sub-merchants under its own account, which typically means higher risk)."

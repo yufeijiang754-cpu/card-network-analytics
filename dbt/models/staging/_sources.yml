@@ -1,0 +1,134 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      Raw authorization data landed from the (synthetic) network switch, one dataset per entity.
+      On DuckDB the tables are read directly from Parquet files via `external_location`;
+      on Snowflake they are tables in the RAW schema loaded with COPY INTO
+      (see snowflake/02_load_raw.sql). ALL DATA IS SYNTHETIC.
+    database: "{{ env_var('SNOWFLAKE_RAW_DATABASE', target.database) }}"
+    schema: raw
+    loader: "generator/generate.py (synthetic) -> Parquet -> DuckDB external read / Snowflake COPY INTO"
+    tables:
+      - name: transactions
+        description: >
+          One row per authorization request message as received by the network switch.
+          Raw and untrusted: may contain duplicates, nulls, malformed codes and broken references.
+        meta:
+          external_location: "read_parquet('{{ env_var(\"RAW_DATA_PATH\", \"../data/raw\") }}/transactions/*.parquet')"
+          owner: "Network Data Engineering"
+          contains_pii: false
+        loaded_at_field: _loaded_at
+        columns:
+          - name: transaction_id
+            description: "Network-assigned identifier of the authorization message. Expected to be unique."
+          - name: timestamp
+            description: "Event time (UTC) at which the authorization request was made at the terminal / gateway."
+          - name: card_id
+            description: "Tokenized card identifier (surrogate for the PAN; no real card numbers are used)."
+          - name: merchant_id
+            description: "Identifier of the card acceptor (merchant) assigned by the acquirer."
+          - name: issuer_id
+            description: "Identifier of the issuing institution that owns the card account and makes the approve/decline decision."
+          - name: acquirer_id
+            description: "Identifier of the acquiring institution that holds the merchant relationship."
+          - name: amount
+            description: "Requested authorization amount in transaction currency. Must be >= 0."
+          - name: currency
+            description: "ISO 4217 alphabetic currency code of the transaction (raw, may be malformed)."
+          - name: channel
+            description: "card_present (chip / swipe / contactless at a terminal) or card_not_present (e-commerce, app, phone)."
+          - name: is_cross_border
+            description: "True when the issuer country differs from the merchant country."
+          - name: auth_response_code
+            description: "ISO 8583 field 39 style response code returned by the issuer ('00' = approved)."
+          - name: is_approved
+            description: "True when the authorization was approved (response code '00')."
+          - name: decline_reason
+            description: "Human-readable decline reason; NULL for approved transactions."
+          - name: interchange_fee
+            description: "Interchange fee in transaction currency, paid by the acquirer to the issuer. Zero for declines."
+          - name: is_fraud
+            description: "True when the transaction was later confirmed as fraudulent (attempted fraud, approved or declined)."
+          - name: is_chargeback
+            description: "True when the cardholder or issuer later disputed the approved transaction (chargeback raised)."
+          - name: _loaded_at
+            description: "Ingestion timestamp (UTC) when the record landed in the data platform."
+
+      - name: merchants
+        description: "Merchant master data maintained by acquirers (one row per merchant)."
+        meta:
+          external_location: "read_parquet('{{ env_var(\"RAW_DATA_PATH\", \"../data/raw\") }}/merchants.parquet')"
+          owner: "Merchant Data Stewardship"
+        columns:
+          - name: merchant_id
+            description: "Merchant identifier (primary key)."
+          - name: merchant_name
+            description: "Doing-business-as name of the merchant (synthetic)."
+          - name: mcc
+            description: "ISO 18245 Merchant Category Code assigned by the acquirer (raw, may be invalid)."
+          - name: country_code
+            description: "ISO 3166-1 alpha-2 country where the merchant is located."
+          - name: acquirer_id
+            description: "Acquirer that onboarded the merchant."
+          - name: onboarding_date
+            description: "Date the merchant started accepting cards on the network."
+
+      - name: cardholders
+        description: "Card account master data provided by issuers (one row per card)."
+        meta:
+          external_location: "read_parquet('{{ env_var(\"RAW_DATA_PATH\", \"../data/raw\") }}/cardholders.parquet')"
+          owner: "Issuer Data Stewardship"
+          contains_pii: false
+        columns:
+          - name: card_id
+            description: "Tokenized card identifier (primary key)."
+          - name: issuer_id
+            description: "Issuer of the card."
+          - name: home_country
+            description: "Country of the issuing account (drives cross-border classification)."
+          - name: card_type
+            description: "Credit or Debit."
+          - name: card_product
+            description: "Product tier: Classic, Rewards, Premium, Business (credit) or Debit."
+          - name: credit_limit
+            description: "Credit line in USD for credit cards; NULL for debit cards."
+          - name: card_open_date
+            description: "Date the card account was opened."
+
+      - name: issuers
+        description: "Issuing institutions participating in the network."
+        meta:
+          external_location: "read_parquet('{{ env_var(\"RAW_DATA_PATH\", \"../data/raw\") }}/issuers.parquet')"
+          owner: "Network Partnerships"
+        columns:
+          - name: issuer_id
+            description: "Issuer identifier (primary key)."
+          - name: issuer_name
+            description: "Issuer legal / brand name (fictional)."
+          - name: country_code
+            description: "Issuer home country."
+          - name: issuer_type
+            description: "Bank, Credit Union or Fintech."
+          - name: asset_size_tier
+            description: "Large (>$10B) or Small (<$10B) by total assets; determines Reg II debit applicability."
+          - name: is_regulated_debit
+            description: "True when the issuer's debit interchange is capped under US Regulation II (Durbin)."
+          - name: onboarded_date
+            description: "Date the issuer joined the network."
+
+      - name: acquirers
+        description: "Acquiring institutions / processors / payment facilitators."
+        meta:
+          external_location: "read_parquet('{{ env_var(\"RAW_DATA_PATH\", \"../data/raw\") }}/acquirers.parquet')"
+          owner: "Network Partnerships"
+        columns:
+          - name: acquirer_id
+            description: "Acquirer identifier (primary key)."
+          - name: acquirer_name
+            description: "Acquirer name (fictional)."
+          - name: country_code
+            description: "Acquirer home country."
+          - name: acquirer_type
+            description: "Bank, Processor or Payment Facilitator (PayFac: onboards sub-merchants under its own merchant account)."
