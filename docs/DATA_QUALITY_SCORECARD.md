@@ -95,16 +95,16 @@ Latest run on 2M rows:
 | Metric | Value |
 |---|---|
 | Injected defects | 41,900 (7 issue types) |
-| Recall (caught by the test designed for that defect) | **98.98%** |
+| Recall (caught by the test designed for that defect) | **99.11%** |
 | Precision (raw-layer tests) | **100%**: 0 records flagged outside the answer key |
-| Misses | 428, all future timestamps 1-4 minutes ahead of ingestion, inside the 5-minute grace window (by design) |
+| Misses | 374, all future timestamps 1-4 minutes ahead of ingestion, inside the 5-minute grace window (by design) |
 | Trusted-layer tests | 44 / 44 pass |
 
 **Coverage lesson:** the MCC *format* check catches only 201 of 300 invalid MCCs, because
 `0000` and `1234` are well-formed. The *reference-list* check catches all 300. Format checks
 and domain checks complement each other; neither is enough alone.
 
-**Grace-window trade-off:** with 0-1 minute grace, recall on future timestamps is 100%. In
+**Grace-window trade-off:** with 0 minutes of grace, recall on future timestamps is 100% (99.98% at 1 minute, 90.7% at 5 minutes). In
 production, though, a tight window also flags legitimate terminals with drifting clocks. The
 grace window is a business decision about acceptable false positives, documented in DECISIONS.md D-09.
 
